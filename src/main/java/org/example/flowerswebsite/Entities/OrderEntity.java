@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Table(name="order")
+@Table(name="orders")
 public class OrderEntity extends BaseEntity {
     private LocalDateTime dateOfCreation;
     private Double orderAmount;
@@ -75,7 +75,7 @@ public class OrderEntity extends BaseEntity {
         this.user = user;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH,targetEntity= OrderContent.class,mappedBy = "order")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH,targetEntity= OrderContent.class,mappedBy = "orders")
     public Set<OrderContent> getOrderContents() {
         return orderContents;
     }

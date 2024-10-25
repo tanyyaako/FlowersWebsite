@@ -18,7 +18,7 @@ public class OrderContent extends BaseEntity{
     protected OrderContent() {}
 
     @ManyToOne(fetch = FetchType.LAZY,cascade=CascadeType.REFRESH,targetEntity= OrderEntity.class)
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "orders_id")
     public OrderEntity getOrder() {
         return order;
     }

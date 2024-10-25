@@ -10,12 +10,12 @@ public class StorageEntity extends BaseEntity{
     private String adress;
     private CityEntity city;
     private Set<StorageContent> storageContents;
-    private Set<OrderEntity> order;
+    private Set<OrderEntity> orders;
 
-    public StorageEntity(String adress, CityEntity city, Set<OrderEntity> order, Set<StorageContent> storageContents) {
+    public StorageEntity(String adress, CityEntity city, Set<OrderEntity> orders, Set<StorageContent> storageContents) {
         this.adress = adress;
         this.city = city;
-        this.order = order;
+        this.orders = orders;
         this.storageContents = storageContents;
     }
 
@@ -48,9 +48,9 @@ public class StorageEntity extends BaseEntity{
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH,targetEntity= OrderEntity.class,mappedBy = "storage")
     public Set<OrderEntity> getOrder() {
-        return order;
+        return orders;
     }
-    public void setOrder(Set<OrderEntity> order) {
-        this.order = order;
+    public void setOrder(Set<OrderEntity> orders) {
+        this.orders = orders;
     }
 }
