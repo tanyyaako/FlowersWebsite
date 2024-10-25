@@ -10,11 +10,11 @@ public class UserEntity extends BaseEntity {
     private String username;
     private String phoneNumber;
     private String email;
-    private Set<OrderEntity> orders;
+    private Set<OrderEntity> orderEntities;
 
-    public UserEntity(String email, Set<OrderEntity> orders, String phoneNumber, String username) {
+    public UserEntity(String email, Set<OrderEntity> orderEntities, String phoneNumber, String username) {
         this.email = email;
-        this.orders = orders;
+        this.orderEntities = orderEntities;
         this.phoneNumber = phoneNumber;
         this.username = username;
     }
@@ -49,11 +49,11 @@ public class UserEntity extends BaseEntity {
     }
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH,targetEntity= OrderEntity.class,mappedBy = "user")
-    public Set<OrderEntity> getOrder() {
-        return orders;
+    public Set<OrderEntity> getOrderEntities() {
+        return orderEntities;
     }
 
-    public void setOrder(Set<OrderEntity> orders) {
-        this.orders = orders;
+    public void setOrderEntities(Set<OrderEntity> orderEntities) {
+        this.orderEntities = orderEntities;
     }
 }

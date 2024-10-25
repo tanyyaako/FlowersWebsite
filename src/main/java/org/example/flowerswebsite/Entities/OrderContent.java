@@ -6,11 +6,11 @@ import jakarta.persistence.*;
 @Table(name = "orderContent")
 public class OrderContent extends BaseEntity{
     private Long quantity;
-    private OrderEntity order;
+    private OrderEntity orderEntity;
     private ProductEntity product;
 
-    public OrderContent(OrderEntity order, ProductEntity product, Long quantity) {
-        this.order = order;
+    public OrderContent(OrderEntity orderEntity, ProductEntity product, Long quantity) {
+        this.orderEntity = orderEntity;
         this.product = product;
         this.quantity = quantity;
     }
@@ -19,12 +19,12 @@ public class OrderContent extends BaseEntity{
 
     @ManyToOne(fetch = FetchType.LAZY,cascade=CascadeType.REFRESH,targetEntity= OrderEntity.class)
     @JoinColumn(name = "orders_id")
-    public OrderEntity getOrder() {
-        return order;
+    public OrderEntity getOrderEntity() {
+        return orderEntity;
     }
 
-    public void setOrder(OrderEntity order) {
-        this.order = order;
+    public void setOrderEntity(OrderEntity orderEntity) {
+        this.orderEntity = orderEntity;
     }
 
     @ManyToOne(fetch = FetchType.LAZY,cascade=CascadeType.REFRESH,targetEntity= ProductEntity.class)
