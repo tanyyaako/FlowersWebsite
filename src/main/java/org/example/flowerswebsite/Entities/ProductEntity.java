@@ -10,21 +10,23 @@ public class ProductEntity extends BaseEntity {
     private String name;
     private String description;
     private Double price;
+    private boolean isDeleted;
     private CategoryEntity category;
     private Set<StorageContent> storageContents;
     private Set<OrderContent> orderContents;
 
-    public ProductEntity(CategoryEntity category, String description, String name,
-                         Set<OrderContent> orderContents, Double price, Set<StorageContent> storageContents) {
+    protected ProductEntity() {}
+
+    public ProductEntity(CategoryEntity category, String description,
+                         boolean isDeleted, String name, Set<OrderContent> orderContents, Double price, Set<StorageContent> storageContents) {
         this.category = category;
         this.description = description;
+        this.isDeleted = false;
         this.name = name;
         this.orderContents = orderContents;
         this.price = price;
         this.storageContents = storageContents;
     }
-
-    protected ProductEntity() {}
 
     @ManyToOne(fetch = FetchType.LAZY,cascade=CascadeType.REFRESH,targetEntity= CategoryEntity.class)
     @JoinColumn(name = "category_id")
@@ -62,6 +64,17 @@ public class ProductEntity extends BaseEntity {
     public void setPrice(Double price) {
         this.price = price;
     }
+
+    @Column(name = "is_deleted")
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
+
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH,targetEntity= StorageContent.class,mappedBy = "product")
     public Set<StorageContent> getStorageContents() {

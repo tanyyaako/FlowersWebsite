@@ -11,6 +11,7 @@ public class CategoryEntity extends BaseEntity {
     private String description;
     private Set<ProductEntity> productEntities;
 
+
     public CategoryEntity(String description, String name, Set<ProductEntity> productEntities) {
         this.description = description;
         this.name = name;

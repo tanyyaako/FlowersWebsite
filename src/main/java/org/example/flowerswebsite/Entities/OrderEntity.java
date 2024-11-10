@@ -3,26 +3,27 @@ package org.example.flowerswebsite.Entities;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name="orders")
 public class OrderEntity extends BaseEntity {
     private LocalDateTime dateOfCreation;
+    private LocalDateTime dateOfCompletion;
     private Double orderAmount;
     private OrderStatus status;
     private UserEntity userEntity;
     private StorageEntity storage;
-    private Set<OrderContent> orderContents;
+    private List<OrderContent> orderContents;
 
-    public OrderEntity(LocalDateTime dateOfCreation, Double orderAmount, Set<OrderContent> orderContents,
-                       OrderStatus status, StorageEntity storage, UserEntity userEntity) {
-        this.dateOfCreation = dateOfCreation;
-        this.orderAmount = orderAmount;
-        this.orderContents = orderContents;
-        this.status = status;
+    public OrderEntity(StorageEntity storage, UserEntity userEntity) {
+        this.dateOfCreation = LocalDateTime.now();
+        this.orderAmount = 0d;
+        this.orderContents = new ArrayList<>();
+        this.status = OrderStatus.CREATED;
         this.storage = storage;
         this.userEntity = userEntity;
+        this.dateOfCompletion = dateOfCompletion;
     }
 
     protected OrderEntity() {}
@@ -34,6 +35,15 @@ public class OrderEntity extends BaseEntity {
 
     public void setDateOfCreation(LocalDateTime dateOfCreation) {
         this.dateOfCreation = dateOfCreation;
+    }
+
+    @Column(name="dateOfCompletion")
+    public LocalDateTime getDateOfCompletion() {
+        return dateOfCompletion;
+    }
+
+    public void setDateOfCompletion(LocalDateTime dateOfCompletion) {
+        this.dateOfCompletion = dateOfCompletion;
     }
 
     @Column(name ="orderAmount")
@@ -53,6 +63,30 @@ public class OrderEntity extends BaseEntity {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public void setOrderContent(ProductEntity productEntity, Long quantity) {
+        OrderContent orderContent = new OrderContent(
+                this,
+                productEntity,
+                quantity
+        );
+        orderContents.add(orderContent);
+        this.orderAmount += productEntity.getPrice() * orderContent.getQuantity();
+        this.orderAmount = Math.floor(orderAmount * 100) / 100;
+    }
+    public void changeStatus(OrderStatus orderStatus) {
+        if (status.equals(OrderStatus.CREATED)) {
+            switch (orderStatus) {
+                case COMPLETED -> {
+                    this.dateOfCompletion = LocalDateTime.now();
+                    this.status = OrderStatus.COMPLETED;
+                }
+                case CANCELED -> {
+                    this.status = OrderStatus.CANCELED;
+                }
+            }
+        }
     }
 
     @ManyToOne(fetch = FetchType.LAZY,cascade=CascadeType.REFRESH,targetEntity= StorageEntity.class)
@@ -76,11 +110,11 @@ public class OrderEntity extends BaseEntity {
     }
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH,targetEntity= OrderContent.class,mappedBy = "orderEntity")
-    public Set<OrderContent> getOrderContents() {
+    public List<OrderContent> getOrderContents() {
         return orderContents;
     }
 
-    public void setOrderContents(Set<OrderContent> orderContents) {
+    public void setOrderContents(List<OrderContent> orderContents) {
         this.orderContents = orderContents;
     }
 }

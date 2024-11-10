@@ -8,15 +8,15 @@ public class CategoryDto {
     private Long id;
     private String name;
     private String description;
-    private Set<ProductEntity> productEntities;
+    private Set<ProductDto> productEntitieDTOs;
 
     public CategoryDto() {}
 
-    public CategoryDto(String description, Long id, String name, Set<ProductEntity> productEntities) {
+    public CategoryDto(String description, Long id, String name, Set<ProductDto> productEntitieDTOs) {
         this.description = description;
         this.id = id;
         this.name = name;
-        this.productEntities = productEntities;
+        this.productEntitieDTOs = productEntitieDTOs;
     }
 
     public String getDescription() {
@@ -43,11 +43,11 @@ public class CategoryDto {
         this.name = name;
     }
 
-    public Set<ProductEntity> getProductEntities() {
-        return productEntities;
+    public Set<ProductDto> getProductEntitieDTOs() {
+        return productEntitieDTOs;
     }
 
-    public void setProductEntities(Set<ProductEntity> productEntities) {
-        this.productEntities = productEntities;
+    public void setProductEntitieDTOs(Set<ProductDto> productEntitieDTOs) {
+        this.productEntitieDTOs = productEntitieDTOs;
     }
 }

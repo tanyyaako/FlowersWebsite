@@ -10,10 +10,14 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface ProductRepository extends GeneralRepository{
+public interface ProductRepository extends GeneralRepository<ProductEntity, Long> {
     @Query(value="select p from ProductEntity p where p.category=:category")
     Set<ProductEntity> findByCategory(@Param("categoty") CategoryEntity category);
 
     @Query(value=" select p from ProductEntity p where p.price between :startPrice and :finishPrice ")
     Set<ProductEntity> findAllByPriceBetween(@Param("starPrice") Double startPrice,@Param("finichPrice") Double finishPrice);
+
+    @Query("select p from ProductEntity p where p.category = :category and p.deleted = false")
+    List<ProductEntity> findAllByCategoryAndIsDeletedFalse(@Param("category") CategoryEntity category);
+
 }
