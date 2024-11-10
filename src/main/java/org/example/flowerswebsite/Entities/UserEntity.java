@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import java.util.Set;
 
 @Entity
-@Table(name= "user")
+@Table(name= "userEntity")
 public class UserEntity extends BaseEntity {
     private String username;
     private String phoneNumber;
@@ -48,7 +48,7 @@ public class UserEntity extends BaseEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH,targetEntity= OrderEntity.class,mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH,targetEntity= OrderEntity.class,mappedBy = "userEntity")
     public Set<OrderEntity> getOrderEntities() {
         return orderEntities;
     }

@@ -11,18 +11,18 @@ public class OrderEntity extends BaseEntity {
     private LocalDateTime dateOfCreation;
     private Double orderAmount;
     private OrderStatus status;
-    private UserEntity user;
+    private UserEntity userEntity;
     private StorageEntity storage;
     private Set<OrderContent> orderContents;
 
     public OrderEntity(LocalDateTime dateOfCreation, Double orderAmount, Set<OrderContent> orderContents,
-                       OrderStatus status, StorageEntity storage, UserEntity user) {
+                       OrderStatus status, StorageEntity storage, UserEntity userEntity) {
         this.dateOfCreation = dateOfCreation;
         this.orderAmount = orderAmount;
         this.orderContents = orderContents;
         this.status = status;
         this.storage = storage;
-        this.user = user;
+        this.userEntity = userEntity;
     }
 
     protected OrderEntity() {}
@@ -67,15 +67,15 @@ public class OrderEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY,cascade=CascadeType.REFRESH,targetEntity= UserEntity.class)
     @JoinColumn(name="user_id")
-    public UserEntity getUser() {
-        return user;
+    public UserEntity getUserEntity() {
+        return userEntity;
     }
 
-    public void setUser(UserEntity user) {
-        this.user = user;
+    public void setUserEntity(UserEntity userEntity) {
+        this.userEntity = userEntity;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH,targetEntity= OrderContent.class,mappedBy = "orders")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH,targetEntity= OrderContent.class,mappedBy = "orderEntity")
     public Set<OrderContent> getOrderContents() {
         return orderContents;
     }
