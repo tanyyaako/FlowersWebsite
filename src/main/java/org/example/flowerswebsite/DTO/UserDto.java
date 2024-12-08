@@ -8,13 +8,15 @@ public class UserDto {
     private String username;
     private String phoneNumber;
     private String email;
+    private String role;
     private Set<OrderDto> orderEntitieDtos;
 
     public UserDto() {}
-    public UserDto(String username, String phoneNumber, String email, Set<OrderDto> orderEntitieDtos) {
+    public UserDto(String username, String phoneNumber, String email,String role, Set<OrderDto> orderEntitieDtos) {
         this.username = username;
         this.phoneNumber = phoneNumber;
         this.email = email;
+        this.role = role;
         this.orderEntitieDtos = orderEntitieDtos;
     }
 
@@ -48,5 +50,13 @@ public class UserDto {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

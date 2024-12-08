@@ -1,7 +1,9 @@
 package org.example.flowerswebsite.services.Impl;
 
 import org.example.flowerswebsite.DTO.CategoryDto;
+import org.example.flowerswebsite.DTO.ProductDto;
 import org.example.flowerswebsite.Entities.CategoryEntity;
+import org.example.flowerswebsite.Entities.ProductEntity;
 import org.example.flowerswebsite.Exceptions.EntityNotFoundException;
 import org.example.flowerswebsite.Repositories.CategoryRepository;
 import org.example.flowerswebsite.services.CategoryService;
@@ -23,32 +25,37 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ResponseEntity<CategoryDto> createCategory(CategoryDto categoryDto){
+    public CategoryDto createCategory(CategoryDto categoryDto){
         CategoryEntity categoryEntity = modelmapper.map(categoryDto, CategoryEntity.class);
         CategoryEntity savedCategory = categoryRepository.save(categoryEntity);
-        CategoryDto savedDto = modelmapper.map(savedCategory, CategoryDto.class);
-        ResponseEntity<CategoryDto> responseEntity = ResponseEntity.ok().body(savedDto);
-        return responseEntity;
+        CategoryDto savedCategoryDto = modelmapper.map(savedCategory, CategoryDto.class);
+        return savedCategoryDto;
     }
 
     @Override
-    public ResponseEntity<CategoryDto> updateCategory(CategoryDto categoryDto) {
+    public CategoryDto updateCategory(CategoryDto categoryDto) {
         CategoryEntity categoryEntity = categoryRepository.findById(categoryDto.getId())
                 .orElseThrow(()-> new EntityNotFoundException("Category not found"));
         categoryEntity.setName(categoryDto.getName());
         CategoryEntity savedEntity = categoryRepository.save(categoryEntity);
-        CategoryDto savedDTO = modelmapper.map(savedEntity, CategoryDto.class);
-        ResponseEntity<CategoryDto> responseEntity = ResponseEntity.ok().body(savedDTO);
-        return responseEntity;
+        CategoryDto savedCategoryDto = modelmapper.map(savedEntity, CategoryDto.class);
+        return savedCategoryDto;
     }
 
     @Override
-    public ResponseEntity<CategoryDto> findById(Long id) {
+    public CategoryDto findById(Long id) {
         CategoryEntity categoryEntity = categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
         CategoryDto categoryDTO = modelmapper.map(categoryEntity, CategoryDto.class);
-        ResponseEntity<CategoryDto> responseEntity = ResponseEntity.ok().body(categoryDTO);
-        return responseEntity;
+        return categoryDTO;
+    }
+    @Override
+    public List<CategoryDto> getAll() {
+        List<CategoryEntity> categoryEntities = categoryRepository.findAll();
+        List<CategoryDto> categoryDtos = categoryEntities.stream()
+                .map(categoryEntity -> modelmapper.map(categoryEntity, CategoryDto.class))
+                .toList();
+        return categoryDtos;
     }
 
 }

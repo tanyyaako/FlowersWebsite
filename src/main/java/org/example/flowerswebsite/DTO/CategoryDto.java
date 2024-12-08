@@ -2,21 +2,22 @@ package org.example.flowerswebsite.DTO;
 
 import org.example.flowerswebsite.Entities.ProductEntity;
 
+import java.util.List;
 import java.util.Set;
 
 public class CategoryDto {
     private Long id;
     private String name;
     private String description;
-    private Set<ProductDto> productEntitieDTOs;
+    private List<Long> productIds;
 
     public CategoryDto() {}
 
-    public CategoryDto(String description, Long id, String name, Set<ProductDto> productEntitieDTOs) {
+    public CategoryDto(String description, Long id, String name, List<Long> productIds) {
         this.description = description;
         this.id = id;
         this.name = name;
-        this.productEntitieDTOs = productEntitieDTOs;
+        this.productIds = productIds;
     }
 
     public String getDescription() {
@@ -43,11 +44,11 @@ public class CategoryDto {
         this.name = name;
     }
 
-    public Set<ProductDto> getProductEntitieDTOs() {
-        return productEntitieDTOs;
+    public List<Long> getProductIds() {
+        return productIds;
     }
 
-    public void setProductEntitieDTOs(Set<ProductDto> productEntitieDTOs) {
-        this.productEntitieDTOs = productEntitieDTOs;
+    public void setProductIds(List<Long> productIds) {
+        this.productIds = productIds;
     }
 }

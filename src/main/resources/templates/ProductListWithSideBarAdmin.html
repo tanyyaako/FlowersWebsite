@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ProductsWithSideBarAdmin</title>
+</head>
+<style>
+    .container {
+        display: flex;
+        gap: 20px;
+    }
+    .sidebar {
+        width: 200px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        background-color: #f9f9f9;
+    }
+    .sidebar a {
+        display: block;
+        padding: 8px;
+        margin-bottom: 10px;
+        text-decoration: none;
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+    .sidebar a:hover {
+        background-color: #ddd;
+    }
+    .sidebar .button {
+        display: block;
+        padding: 8px;
+        margin-top: 10px;
+        text-decoration: none;
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        text-align: center;
+        background-color: #007bff;
+        color: #fff;
+        transition: background-color 0.3s;
+    }
+    .sidebar .button:hover {
+        background-color: #0056b3;
+    }
+    .main {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #fff;
+    }
+    .category-card {
+        margin-bottom: 15px;
+        padding: 20px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        background-color: #fff;
+        width: 250px;
+        height: 300px;
+    }
+    .category-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+    .category-card p {
+        font-size: 1rem;
+    }
+    .category-card button {
+        margin-top: 15px;
+        padding: 10px 20px;
+    }
+</style>
+<body>
+<div class="container">
+    <div class="sidebar">
+        <h2>Категории</h2>
+        <a href="/category/create" class="button">Создать новую категорию</a>
+        <div th:each="category : ${categories}">
+            <a th:href="@{/product/category/{id}(id=${category.id})}" th:text="${category.name}"></a>
+            <a th:href="@{/category/{id}/edit(id=${category.id})}" class="button">Редактировать</a>
+        </div>
+    </div>
+    <div class="main">
+        <h1>Товары</h1>
+        <div th:if="${categories != null}">
+            <div class="category-cards-container">
+                <div th:each="category : ${categories}" class="category-card">
+                    <h3 th:text="${category.name}"></h3>
+                    <p th:text="${category.description}"></p>
+                    <a th:href="@{/product/category/{id}(id=${category.id})}">
+                        <button>Посмотреть товары</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -6,11 +6,10 @@ import org.example.flowerswebsite.Entities.CategoryEntity;
 import org.example.flowerswebsite.Entities.ProductEntity;
 import org.example.flowerswebsite.Exceptions.EntityNotFoundException;
 import org.example.flowerswebsite.Repositories.CategoryRepository;
+import org.example.flowerswebsite.Repositories.OrderContentRepository;
 import org.example.flowerswebsite.Repositories.ProductRepository;
-import org.example.flowerswebsite.Repositories.StorageRepository;
 import org.example.flowerswebsite.services.ProductService;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,30 +19,37 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
     private final CategoryRepository categoryRepository;
-    private final StorageRepository storageRepository;
+    private final OrderContentRepository orderContentRepository;
 
     public ProductServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper,
-                              ProductRepository productRepository, StorageRepository storageRepository) {
+                              ProductRepository productRepository,
+                              OrderContentRepository orderContentRepository) {
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
         this.productRepository = productRepository;
-        this.storageRepository = storageRepository;
+        this.orderContentRepository=orderContentRepository;
     }
 
     @Override
-    public ResponseEntity<ProductDto> createProduct(ProductDto productDto) {
+    public ProductDto createProduct(ProductDto productDto) {
         ProductEntity productEntity = modelMapper.map(productDto, ProductEntity.class);
         CategoryEntity categoryEntityId = categoryRepository.findById(productDto.getCategoryId())
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
         productEntity.setCategory(categoryEntityId);
         ProductEntity savedProductEntity = productRepository.save(productEntity);
         ProductDto savedProductDto = modelMapper.map(savedProductEntity, ProductDto.class);
-        ResponseEntity<ProductDto> responseEntity = ResponseEntity.ok().body(savedProductDto);
-        return responseEntity;
+        return savedProductDto;
     }
 
     @Override
-    public ResponseEntity<ProductDto> update(ProductDto productDto) {
+    public ProductDto getById(Long id){
+        ProductEntity productEntity = productRepository.findById(id).orElseThrow();
+        ProductDto savedProductDto = modelMapper.map(productEntity, ProductDto.class);
+        return savedProductDto;
+    }
+
+    @Override
+    public ProductDto update(ProductDto productDto) {
         ProductEntity productEntity = productRepository.findById(productDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
         if (productDto.getCategoryId() != null ) {
@@ -65,21 +71,21 @@ public class ProductServiceImpl implements ProductService {
         }
         ProductEntity savedProductEntity = productRepository.save(productEntity);
         ProductDto savedProductDto = modelMapper.map(savedProductEntity, ProductDto.class);
-        ResponseEntity<ProductDto> responseEntity = ResponseEntity.ok().body(savedProductDto);
-        return responseEntity;
+        return savedProductDto;
     }
 
     @Override
-    public ResponseEntity<List<ProductDto>> getAllByCategory(Long categoryId) {
+    public List<ProductDto> getAllByCategory(Long categoryId) {
         CategoryEntity categoryEntity = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + categoryId + " not found"));
         List<ProductEntity> productEntities = productRepository.findAllByCategoryAndIsDeletedFalse(categoryEntity);
         List<ProductDto> productDTOs = productEntities.stream()
                 .map(productEntity -> modelMapper.map(productEntity, ProductDto.class))
                 .toList();
-        ResponseEntity<List<ProductDto>> responseEntity = ResponseEntity.ok().body(productDTOs);
-        return responseEntity;
+        return productDTOs;
     }
+
+
     @Override
     public void delete(Long id) {
         ProductEntity productEntity = productRepository.findById(id)
@@ -87,5 +93,106 @@ public class ProductServiceImpl implements ProductService {
         productEntity.setDeleted(true);
         productRepository.save(productEntity);
     }
+
+    @Override
+    public void setSale(Long productID ,Double sale){
+        ProductEntity productEntity = productRepository.findById(productID)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id " + productID + " not found"));
+        Double oldPrice = productEntity.getPrice();
+        Double newPrice = oldPrice-(oldPrice*sale/100);
+        productEntity.setSalePrice(newPrice);
+        productRepository.save(productEntity);
+    }
+    @Override
+    public Double getSaleOfProduct(Long productID){
+        ProductEntity productEntity = productRepository.findById(productID)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id " + productID + " not found"));
+        Double price = productEntity.getPrice();
+        Double salePrice = productEntity.getSalePrice();
+        if (price == null || salePrice == null || price <= 0) {
+            return 0.0;
+        }
+        Double sale = ((price - salePrice) / price) * 100;
+        return Math.round(sale * 100.0) / 100.0;
+    }
+
+    @Override
+    public List<ProductDto> getSaleProducts(){
+        List<ProductEntity> productEntities = productRepository.findAllBySale();
+        System.out.println(productEntities);
+        List<ProductDto> productDTOs = productEntities.stream()
+                .map(productEntity -> modelMapper.map(productEntity, ProductDto.class))
+                .toList();
+        System.out.println(productDTOs);
+        return productDTOs;
+    }
+
+    @Override
+    public void deleteSale(Long productID){
+        ProductEntity productEntity = productRepository.findById(productID)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id " + productID + " not found"));
+        productEntity.setSalePrice(null);
+        productRepository.save(productEntity);
+    }
+
+    @Override
+    public List<ProductDto> getTopSelling(){
+        List<Object[]> results = orderContentRepository.findTopSellingProducts();
+        List<ProductEntity > topProducts =results.stream()
+                .map(res -> (ProductEntity) res[0])
+                .limit(10)
+                .toList();
+
+        List<ProductDto> productDTOs = topProducts.stream()
+                .map(productEntity -> modelMapper.map(productEntity, ProductDto.class))
+                .toList();
+        return productDTOs;
+    }
+
+    @Override
+    public List<ProductDto> getByCategoriesOrPrice(List<CategoryDto> categoryDtos, Double priceFrom, Double priceTo) {
+        List<CategoryEntity> categoryEntities = null;
+        if (categoryDtos != null) {
+            categoryEntities = categoryDtos.stream()
+                    .map(categoryDto -> modelMapper.map(categoryDto, CategoryEntity.class))
+                    .toList();
+        }
+        List<ProductEntity> productEntities;
+        if (categoryDtos != null && priceFrom != null && priceTo != null) {
+            productEntities = productRepository.findByCategoriesInAndPriceBetween(categoryEntities, priceFrom, priceTo);
+        } else if (categoryDtos != null) {
+            productEntities = productRepository.findByCategories(categoryEntities);
+        } else if (priceFrom != null && priceTo != null) {
+            productEntities = productRepository.findAllByPriceBetween(priceFrom, priceTo);
+        } else if (priceFrom != null) {
+            productEntities = productRepository.findByPriceGreaterThanEqual(priceFrom);
+        } else if (priceTo != null) {
+            productEntities = productRepository.findByPriceLessThanEqual(priceTo);
+        } else {
+            productEntities = productRepository.findAllIsNotDeleted();
+        }
+        List<ProductDto> productDtos = productEntities.stream()
+                .map(productEntity -> modelMapper.map(productEntity, ProductDto.class))
+                .toList();
+        return productDtos;
+    }
+    @Override
+    public List<ProductDto> getAll() {
+        List<ProductEntity> productEntities = productRepository.findAll();
+        List<ProductDto> productDtos = productEntities.stream()
+                .map(productEntity -> modelMapper.map(productEntity, ProductDto.class))
+                .toList();
+        return productDtos;
+    }
+    @Override
+    public List<ProductDto> getAllNotDeleted(){
+        List<ProductEntity> productEntities = productRepository.findAllIsNotDeleted();
+        List<ProductDto> productDtos = productEntities.stream()
+                .map(productEntity -> modelMapper.map(productEntity,ProductDto.class))
+                .toList();
+        return productDtos;
+    }
+
+
 
 }

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ProductEdit</title>
+</head>
+<body>
+    <div>
+        <h1>Редактирование товара</h1>
+        <form th:action="@{/product/{id}/edit(id=${updateForm.id})}" method="post" th:object = "${updateForm}">
+            <label for="name">Название:</label>
+            <input type="text" id="name" th:field="*{name}">
+            <label for="price">Цена:</label>
+            <input type="number" id="price" th:field="*{price}">
+            <label for ="sale">Процент скидки:</label>
+            <input type="number" id="sale" th:field="*{sale}">
+            <label for="url">Ссылка на изображение:</label>
+            <input type="text" id="url" th:field="*{url}">
+            <label for="categoryID">Категория:</label>
+            <select id="categoryID" th:field="*{categoryID}">
+                <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id == updateForm.categoryID}"></option>
+            </select>
+            <button type ="submit">Сохранить</button>
+        </form>
+    </div>
+
+</body>
+</html>

@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface OrderService {
-    ResponseEntity<OrderDto> createOrder(OrderDto orderDto);
-    ResponseEntity<OrderDto> updateOrderStatus(Long id, OrderStatus orderStatus);
-    ResponseEntity<OrderDto> findById(Long id);
-    ResponseEntity<List<OrderDto>> findAllActive();
+    OrderDto createOrder(OrderDto orderDto);
+    OrderDto updateOrderStatus(Long id, OrderStatus orderStatus);
+    OrderDto findById(Long id);
+    List<OrderDto> findAllActive();
 }

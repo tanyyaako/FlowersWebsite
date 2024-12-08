@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ProductCreate</title>
+</head>
+<body>
+    <div>
+        <h1>Создание товара</h1>
+        <div class="form-container">
+            <form action="/product/create" method="post" th:object="${form}">
+                <label for="name">Название:</label>
+                <input type="text" id="name" th:field="*{name}" required>
+                <label for="price">Цена:</label>
+                <input type="number" id="price" th:field="*{price}" required>
+                <label for="url">Ссылка на изображение:</label>
+                <input type="text" id="url" th:field="*{url}">
+                <label for="categoryID">Категория:</label>
+                <select id="categoryID" th:field="*{categoryID}" required>
+                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                </select>
+                <button type="submit">Создать</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

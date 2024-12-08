@@ -6,8 +6,9 @@ import jakarta.persistence.MappedSuperclass;
 public abstract class BaseEntity {
     private Long id;
 
+    protected BaseEntity() {
+    }
     @Id
-    @Column(insertable = false, name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long getId() {
         return id;

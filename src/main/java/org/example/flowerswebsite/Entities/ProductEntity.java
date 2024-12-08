@@ -10,22 +10,27 @@ public class ProductEntity extends BaseEntity {
     private String name;
     private String description;
     private Double price;
+    private Double salePrice;
     private boolean isDeleted;
     private CategoryEntity category;
-    private Set<StorageContent> storageContents;
     private Set<OrderContent> orderContents;
+    private Double quantityProduct;
+    private String url;
 
     protected ProductEntity() {}
 
     public ProductEntity(CategoryEntity category, String description,
-                         boolean isDeleted, String name, Set<OrderContent> orderContents, Double price, Set<StorageContent> storageContents) {
+                         boolean isDeleted, String name, Set<OrderContent> orderContents,
+                         Double price, Double salePrice,Double quantityProduct, String url) {
         this.category = category;
         this.description = description;
         this.isDeleted = false;
         this.name = name;
         this.orderContents = orderContents;
         this.price = price;
-        this.storageContents = storageContents;
+        this.salePrice = salePrice;
+        this.quantityProduct = quantityProduct;
+        this.url = url;
     }
 
     @ManyToOne(fetch = FetchType.LAZY,cascade=CascadeType.REFRESH,targetEntity= CategoryEntity.class)
@@ -74,17 +79,6 @@ public class ProductEntity extends BaseEntity {
         isDeleted = deleted;
     }
 
-
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH,targetEntity= StorageContent.class,mappedBy = "product")
-    public Set<StorageContent> getStorageContents() {
-        return storageContents;
-    }
-
-    public void setStorageContents(Set<StorageContent> storageContents) {
-        this.storageContents = storageContents;
-    }
-
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH,targetEntity= OrderContent.class,mappedBy = "product")
     public Set<OrderContent> getOrderContents() {
         return orderContents;
@@ -92,5 +86,32 @@ public class ProductEntity extends BaseEntity {
 
     public void setOrderContents(Set<OrderContent> orderContents) {
         this.orderContents = orderContents;
+    }
+
+    @Column(name = "sale_price")
+    public Double getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(Double salePrice) {
+        this.salePrice = salePrice;
+    }
+
+    @Column(name = "quantity")
+    public Double getQuantityProduct() {
+        return quantityProduct;
+    }
+
+    public void setQuantityProduct(Double quantityProduct) {
+        this.quantityProduct = quantityProduct;
+    }
+
+    @Column(name = "url")
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

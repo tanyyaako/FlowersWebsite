@@ -10,13 +10,15 @@ public class UserEntity extends BaseEntity {
     private String username;
     private String phoneNumber;
     private String email;
+    private UserRoleEnum role;
     private Set<OrderEntity> orderEntities;
 
-    public UserEntity(String email, Set<OrderEntity> orderEntities, String phoneNumber, String username) {
+    public UserEntity(String email, Set<OrderEntity> orderEntities, String phoneNumber, String username, UserRoleEnum role) {
         this.email = email;
         this.orderEntities = orderEntities;
         this.phoneNumber = phoneNumber;
         this.username = username;
+        this.role = role;
     }
 
     protected UserEntity() {}
@@ -55,5 +57,15 @@ public class UserEntity extends BaseEntity {
 
     public void setOrderEntities(Set<OrderEntity> orderEntities) {
         this.orderEntities = orderEntities;
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    public UserRoleEnum getRole() {
+        return role;
+    }
+
+    public void setRole(UserRoleEnum role) {
+        this.role = role;
     }
 }

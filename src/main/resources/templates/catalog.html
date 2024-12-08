@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Каталог</title>
+</head>
+<body>
+    <header>
+        <div>
+            <img th:src="${baseView.logoPath}" alt="Логотип" width="100">
+        </div>
+    </header>
+
+    <main>
+        <!-- Форма фильтрации продуктов -->
+        <section>
+            <h2>Фильтры</h2>
+            <form th:action="@{/catalog}" method="get">
+                <div>
+                    <label for="priceFrom">Цена от:</label>
+                    <input type="number" id="priceFrom" name="form.productSearchForm.fromPrice" step="0.01"
+                           th:value="${form.productSearchForm.fromPrice}"/>
+                </div>
+                <div>
+                    <label for="priceTo">Цена до:</label>
+                    <input type="number" id="priceTo" name="form.productSearchForm.toPrice" step="0.01"
+                           th:value="${form.productSearchForm.toPrice}"/>
+                </div>
+                <div>
+                    <h3>Категории</h3>
+                    <ul>
+                        <li th:each="category : ${form.productSearchForm.categoryViews}">
+                            <label>
+                                <input type="checkbox" th:name="form.productSearchForm.categoryViews[__${category.index}__].selected"
+                                       th:checked="${category.selected}"/>
+                                <span th:text="${category.name}"></span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+                <button type="submit">Применить фильтры</button>
+            </form>
+        </section>
+        <!-- Список продуктов -->
+        <section>
+            <h2>Продукты</h2>
+            <div class="product-list">
+                <div class="product-item" th:each="product : ${products}">
+                    <img th:src="${product.url}" alt="Фото продукта" width="150">
+                    <h3 th:text="${product.name}"></h3>
+                    <p>
+                        <span>Цена:</span> <span th:text="${product.price}"></span>
+                    </p>
+                    <p th:if="${product.salePrice != null}">
+                        <span>Скидка:</span> <span th:text="${product.salePrice}"></span>
+                    </p>
+                    <p>
+                        <span>Категория:</span> <span th:text="${product.categoryId}"></span>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <<p th:text="${baseView.aboutUsInformation}">Информация о нас</p>
+    </footer>
+
+
+</body>
+</html>

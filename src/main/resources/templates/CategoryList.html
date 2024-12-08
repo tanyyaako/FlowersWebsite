@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CategoryList</title>
+</head>
+<style>
+    .container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .category-cards-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    .category-card {
+        margin-bottom: 15px;
+        padding: 20px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        background-color: #fff;
+        width: 250px;
+        height: 300px;
+    }
+
+    .category-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+
+    .category-card p {
+        font-size: 1rem;
+    }
+
+    .category-card button {
+        margin-top: 15px;
+        padding: 10px 20px;
+    }
+</style>
+    <body>
+    <div class="container">
+        <a href="/category/create">
+            <button class="add-category-button">Создать категорию</button>
+        </a>
+        <a href="/product/list">
+            <button class="redirect to productList">Товары</button>
+        </a>
+        <div th:if="${categories != null}">
+            <h1>Категории</h1>
+            <div class="category-cards-container">
+                <div th:each="category : ${categories}">
+                    <div class="category-card">
+                        <h3 th:text="${category.name}"></h3>
+                        <p th:text="${category.description}"></p>
+                        <a th:href="@{/category/{id}/edit(id=${category.id})}">
+                            <button>Обновить</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${categories == null and updateCategory == null}">
+            <h1>Создание категории</h1>
+            <div class="form-container">
+                <form action="/category/create" method="post">
+                    <label for="name">Название:</label>
+                    <input type="text" id="name" name="name" required>
+                    <label for="description">Описание:</label>
+                    <textarea id="description" name="description"></textarea>
+                    <button type="submit">Создать</button>
+                </form>
+            </div>
+        </div>
+        <div th:if="${updateCategory != null}">
+            <h1>Обновление категории</h1>
+            <div class="form-container">
+                <form th:action="@{/category/{id}/edit(id=${updateCategory.id})}" method="post" th:object="${updateCategory}">
+                    <label for="name">Название:</label>
+                    <input type="text" id="name" name="name" th:value="${updateCategory.name}" required>
+                    <label for="description">Описание:</label>
+                    <textarea id="description" name="description" th:text="${updateCategory.description}"></textarea>
+                    <button type="submit">Обновить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>

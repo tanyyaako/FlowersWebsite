@@ -13,15 +13,13 @@ public class OrderEntity extends BaseEntity {
     private Double orderAmount;
     private OrderStatus status;
     private UserEntity userEntity;
-    private StorageEntity storage;
     private List<OrderContent> orderContents;
 
-    public OrderEntity(StorageEntity storage, UserEntity userEntity) {
+    public OrderEntity( UserEntity userEntity) {
         this.dateOfCreation = LocalDateTime.now();
         this.orderAmount = 0d;
         this.orderContents = new ArrayList<>();
         this.status = OrderStatus.CREATED;
-        this.storage = storage;
         this.userEntity = userEntity;
         this.dateOfCompletion = dateOfCompletion;
     }
@@ -89,15 +87,6 @@ public class OrderEntity extends BaseEntity {
         }
     }
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade=CascadeType.REFRESH,targetEntity= StorageEntity.class)
-    @JoinColumn(name="storage_id")
-    public StorageEntity getStorage() {
-        return storage;
-    }
-
-    public void setStorage(StorageEntity storage) {
-        this.storage = storage;
-    }
 
     @ManyToOne(fetch = FetchType.LAZY,cascade=CascadeType.REFRESH,targetEntity= UserEntity.class)
     @JoinColumn(name="user_id")
