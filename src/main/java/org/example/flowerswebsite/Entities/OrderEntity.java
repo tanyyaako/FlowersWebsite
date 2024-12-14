@@ -1,6 +1,7 @@
 package org.example.flowerswebsite.Entities;
 
 import jakarta.persistence.*;
+import org.example.flowerswebsite.Entities.Enums.OrderStatus;
 
 import java.time.LocalDateTime;
 import java.util.*;

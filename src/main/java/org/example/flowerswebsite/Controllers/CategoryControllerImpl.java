@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.controllers.Category.CategoryController;
 import org.example.flowerswebsite.DTO.CategoryDto;
 import org.example.flowerswebsite.DTO.ProductDto;
+import org.example.flowerswebsite.Entities.CategoryType;
 import org.example.flowerswebsite.services.CategoryService;
 import org.example.flowerswebsite.services.ProductService;
 import org.example.viewModel.Base.BaseView;
@@ -43,33 +44,17 @@ public class CategoryControllerImpl implements CategoryController {
     @GetMapping("/listCategory")
     public String listProducts(Model model){
         List<CategoryDto> categoryDtos = categoryService.getAll();
-        List<ProductDto> products = productService.getAllNotDeleted();
         List<CategoryView> categoryViews = categoryDtos.stream()
-                .map(categoryDto -> new CategoryView(
-                        categoryDto.getId(),
-                        categoryDto.getName(),
-                        categoryDto.getDescription(),
-                        products.stream()
-                                .filter(product -> product.getCategoryId().equals(categoryDto.getId()))
-                                .map(product -> new ProductView(
-                                        product.getId(),
-                                        product.getName(),
-                                        product.getPrice(),
-                                        product.getUrl(),
-                                        product.getCategoryId(),
-                                        product.getSalePrice()
-                                ))
-                                .toList()
-                ))
+                .map(categoryDto -> modelMapper.map(categoryDto,CategoryView.class))
                 .toList();
         model.addAttribute("categories",categoryViews);
         return "CategoryList.html";
     }
-
     @Override
     @GetMapping("/create")
     public String createForm(Model model){
-        model.addAttribute("form", new CategoryCreateForm(""));
+        model.addAttribute("form", new CategoryCreateForm("",""));
+        model.addAttribute("categoryTypes", List.of("Flowers", "Gifts", "Celebration"));
         return "CategoryList.html";
     }
 
@@ -79,6 +64,7 @@ public class CategoryControllerImpl implements CategoryController {
                          BindingResult bindingResult,Model model){
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setName(form.name());
+        categoryDto.setType(CategoryType.valueOf(form.type().toUpperCase()));
         categoryService.createCategory(categoryDto);
         return "redirect:/category/listCategory";
     }
@@ -88,24 +74,16 @@ public class CategoryControllerImpl implements CategoryController {
     public String editForm(@PathVariable Long id,Model model){
         CategoryDto categoryDto = categoryService.findById(id);
         List<ProductDto> products = productService.getAllByCategory(categoryDto.getId());
-        List<ProductView> productViews = products.stream()
-                .map(product -> new ProductView(
-                        product.getId(),
-                        product.getName(),
-                        product.getPrice(),
-                        product.getUrl(),
-                        product.getCategoryId(),
-                        product.getSalePrice()
-                ))
-                .toList();
         CategoryView categoryView = new CategoryView(
                 categoryDto.getId(),
                 categoryDto.getName(),
                 categoryDto.getDescription(),
-                productViews
+                categoryDto.getProductIds(),
+                categoryDto.getType().toString()
         );
-        CategoryEditForm categoryEditForm = new CategoryEditForm(categoryView.getId(),categoryView.getName(),categoryView.getDescription());
+        CategoryEditForm categoryEditForm = new CategoryEditForm(categoryView.getId(),categoryView.getName(),categoryView.getDescription(), categoryView.getType());
         model.addAttribute("updateCategory",categoryEditForm);
+        model.addAttribute("categoryTypes", List.of("Flowers", "Gifts", "Celebration"));
         return "CategoryList.html";
     }
 
@@ -117,6 +95,7 @@ public class CategoryControllerImpl implements CategoryController {
         categoryDto.setId(id);
         System.out.println(categoryDto.getId());
         categoryDto.setName(form.name());
+        categoryDto.setType(CategoryType.valueOf(form.type().toUpperCase()));
         categoryService.updateCategory(categoryDto);
         return "redirect:/category/listCategory";
     }

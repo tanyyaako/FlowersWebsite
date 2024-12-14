@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <main class="jumbotron text-center rounded col-md-12 align-self-center pt-5">
+                <div class="justify-content-center">
+                    <h1>Profile</h1>
+                </div>
+                <div class="row bg-light rounded">
+                    <div class="col-md-6" th:object="${user}">
+                        <h4 th:text="'Username: ' + *{username}"></h4>
+                        <h4 th:text="'Номер телефона: ' + *{phoneNumber}"></h4>
+                        <h4 th:text="'Email: ' + *{email}"></h4>
+                        <a href="/home" class="back-button">Назад</a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</main>
+</body>
+</html>

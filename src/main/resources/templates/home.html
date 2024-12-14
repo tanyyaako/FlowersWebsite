@@ -122,16 +122,39 @@
       background-color: #4CAFF0;
       color: white;
     }
+    .catalog-button{
+      padding: 10px 15px;
+      background-color: #f4f4f4;
+      color: #3a8cc4;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+    .catalog-button:hover {
+      background-color: #0056b3;
+    }
   </style>
 <body>
   <header>
     <div class="logo">
       <img th:src="@{${baseView.logo}}" alt="Логотип">
     </div>
-    <nav >
-      <button>Цветы</button>
-      <button>Подарки</button>
-      <button>К празднику</button>
+    <nav xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      <form th:action="@{/users/logout}" method="post" sec:authorize="isAuthenticated()">
+        <button type="submit">Выход</button>
+      </form>
+      <form th:action="@{/users/login}" method="post" sec:authorize="!isAuthenticated()">
+        <button type="submit">Войти</button>
+      </form>
+      <form th:action="@{/users/profile}" method="get" sec:authorize="isAuthenticated()">
+        <button type="submit">Профиль</button>
+      </form>
+      <a href="/product/catalog?categoryType=Flowers" class="catalog-button">Цветы</a>
+      <a href="/product/catalog?categoryType=Gifts" class="catalog-button">Подарки</a>
+      <a href="/product/catalog?categoryType=Celebration" class="catalog-button">Праздники</a>
     </nav>
   </header>
   <div>
@@ -142,7 +165,7 @@
         <ul>
           <li th:each="bestSeller : ${bestsellers}">
             <img th:src="@{${bestSeller.productView.url}}" alt="Изображение" >
-            <h3 th:text="${bestSeller.productView.nameOfProduct}">Название</h3>
+            <h3 th:text="${bestSeller.productView.name}">Название</h3>
             <p th:text="${bestSeller.productView.price}">Цена</p>
           </li>
         </ul>
@@ -155,7 +178,7 @@
         <ul>
           <li th:each="sale : ${sales}">
             <img th:src="@{${sale.url}}" alt="Изображение продукта" style="width: 100px;">
-            <h3 th:text="${sale.nameOfProduct}"></h3>
+            <h3 th:text="${sale.name}"></h3>
             <h3 th:text="'Старая цена: '+${sale.price}"></h3>
             <h3 th:text="'Новая цена: '+${sale.salePrice}"></h3>
           </li>

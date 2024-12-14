@@ -1,6 +1,6 @@
 package org.example.flowerswebsite.DTO;
 
-import org.example.flowerswebsite.Entities.OrderStatus;
+import org.example.flowerswebsite.Entities.Enums.OrderStatus;
 
 import java.time.LocalDateTime;
 import java.util.Set;

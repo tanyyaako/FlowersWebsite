@@ -1,5 +1,6 @@
 package org.example.flowerswebsite.DTO;
 
+import org.example.flowerswebsite.Entities.CategoryType;
 import org.example.flowerswebsite.Entities.ProductEntity;
 
 import java.util.List;
@@ -10,10 +11,11 @@ public class CategoryDto {
     private String name;
     private String description;
     private List<Long> productIds;
+    private CategoryType type;
 
     public CategoryDto() {}
 
-    public CategoryDto(String description, Long id, String name, List<Long> productIds) {
+    public CategoryDto(String description, Long id, String name, List<Long> productIds,CategoryType type) {
         this.description = description;
         this.id = id;
         this.name = name;
@@ -50,5 +52,13 @@ public class CategoryDto {
 
     public void setProductIds(List<Long> productIds) {
         this.productIds = productIds;
+    }
+
+    public CategoryType getType() {
+        return type;
+    }
+
+    public void setType(CategoryType type) {
+        this.type = type;
     }
 }

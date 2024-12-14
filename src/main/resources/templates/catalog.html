@@ -1,71 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Каталог</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            margin: 20px;
+        }
+
+        .sidebar {
+            width: 25%;
+            padding: 20px;
+            background-color: #f4f4f4;
+            border-right: 1px solid #ccc;
+        }
+
+        .content {
+            width: 75%;
+            padding: 20px;
+        }
+
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        .product-card h3 {
+            margin-top: 0;
+        }
+
+        .product-card p {
+            margin: 10px 0;
+        }
+
+        .product-card a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .product-card a:hover {
+            text-decoration: underline;
+        }
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100px;
+            background-color: #4CAFF0;
+            color: white;
+            padding: 20px;
+        }
+        header .logo {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+        }
+         logo .a{
+             margin-left: 10px;
+         }
+
+        header nav {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+            margin-top: auto;
+        }
+
+        header nav button {
+            background-color: #4CAFF0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        header nav button:hover {
+            background-color: #f4f4f4;
+        }
+        header img {
+            height: auto;
+            max-height: 80px;
+        }
+        header p {
+            font-size: 1.2rem;
+        }
+        .back-button {
+            padding: 10px 15px;
+            background-color: #f4f4f4;
+            color: #3a8cc4;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+        .catalog-button{
+            padding: 10px 15px;
+            background-color: #f4f4f4;
+            color: #3a8cc4;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+        .catalog-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
+
 <body>
     <header>
-        <div>
-            <img th:src="${baseView.logoPath}" alt="Логотип" width="100">
+        <div class="logo">
+            <img th:src="@{${baseView.logo}}" alt="Логотип">
+            <a href="/home" class="back-button">Назад</a>
         </div>
+
+        <nav >
+            <a href="/product/catalog?categoryType=Flowers" class="catalog-button">Цветы</a>
+            <a href="/product/catalog?categoryType=Gifts" class="catalog-button">Подарки</a>
+            <a href="/product/catalog?categoryType=Celebration" class="catalog-button">Праздники</a>
+        </nav>
+
     </header>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Форма поиска</h2>
+            <form th:action="@{/product/catalog}" method="post">
+                <input type="hidden" name="categoryType" th:value="${form.categoryType}">
+                <input type="text" name="productSearchForm.searchProduct" placeholder="Поиск товара" th:value="${form.productSearchForm.searchProduct}">
+                <input type="number" name="productSearchForm.fromPrice" placeholder="Цена от" th:value="${form.productSearchForm.fromPrice}">
+                <input type="number" name="productSearchForm.toPrice" placeholder="Цена до" th:value="${form.productSearchForm.toPrice}">
+                <h3>Выберите категории:</h3>
+                <div th:each="category : ${categories}">
+                    <label>
+                        <input type="checkbox" name="productSearchForm.categoryViews[0].id" th:value="${category.getId()}" />
+                        <span th:text="${category.name}"></span>
+                    </label><br />
+                </div>
 
-    <main>
-        <!-- Форма фильтрации продуктов -->
-        <section>
-            <h2>Фильтры</h2>
-            <form th:action="@{/catalog}" method="get">
-                <div>
-                    <label for="priceFrom">Цена от:</label>
-                    <input type="number" id="priceFrom" name="form.productSearchForm.fromPrice" step="0.01"
-                           th:value="${form.productSearchForm.fromPrice}"/>
-                </div>
-                <div>
-                    <label for="priceTo">Цена до:</label>
-                    <input type="number" id="priceTo" name="form.productSearchForm.toPrice" step="0.01"
-                           th:value="${form.productSearchForm.toPrice}"/>
-                </div>
-                <div>
-                    <h3>Категории</h3>
-                    <ul>
-                        <li th:each="category : ${form.productSearchForm.categoryViews}">
-                            <label>
-                                <input type="checkbox" th:name="form.productSearchForm.categoryViews[__${category.index}__].selected"
-                                       th:checked="${category.selected}"/>
-                                <span th:text="${category.name}"></span>
-                            </label>
-                        </li>
-                    </ul>
-                </div>
-                <button type="submit">Применить фильтры</button>
+                <button type="submit">Поиск</button>
             </form>
-        </section>
-        <!-- Список продуктов -->
-        <section>
-            <h2>Продукты</h2>
+        </aside>
+
+        <main class="content">
+            <h1>Каталог</h1>
             <div class="product-list">
-                <div class="product-item" th:each="product : ${products}">
-                    <img th:src="${product.url}" alt="Фото продукта" width="150">
-                    <h3 th:text="${product.name}"></h3>
-                    <p>
-                        <span>Цена:</span> <span th:text="${product.price}"></span>
-                    </p>
-                    <p th:if="${product.salePrice != null}">
-                        <span>Скидка:</span> <span th:text="${product.salePrice}"></span>
-                    </p>
-                    <p>
-                        <span>Категория:</span> <span th:text="${product.categoryId}"></span>
-                    </p>
-                </div>
+                <th:block th:if="${products != null and !products.isEmpty()}">
+                    <th:block th:each="product : ${products}">
+                        <div class="product-card">
+                            <h3 th:text="${product.name}">Название продукта</h3>
+                            <p>Цена: <span th:text="${product.price}">Цена</span> руб.</p>
+                            <p th:if="${product.salePrice != null}">
+                                Скидочная цена: <span th:text="${product.salePrice}">Скидочная цена</span> руб.
+                            </p>
+                            <form th:action="@{/product/{id}/details(id=${product.id})}" method="get">
+                                <input type="hidden" name="categoryType" th:value="${categoryType}">
+                                <button type="submit">Подробнее</button>
+                            </form>
+                        </div>
+                    </th:block>
+                </th:block>
+                <p th:if="${products == null || products.isEmpty()}">Продукты не найдены</p>
             </div>
-        </section>
-    </main>
-
-    <footer>
-        <<p th:text="${baseView.aboutUsInformation}">Информация о нас</p>
-    </footer>
-
-
+        </main>
+    </div>
 </body>
 </html>

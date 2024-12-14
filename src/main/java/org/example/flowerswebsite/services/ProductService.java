@@ -17,8 +17,9 @@ public interface ProductService {
     List<ProductDto> getSaleProducts();
     void deleteSale(Long productID);
     List<ProductDto> getTopSelling();
-    List<ProductDto> getByCategoriesOrPrice(List<CategoryDto> categoryDtos, Double priceFrom, Double priceTo);
+    List<ProductDto> getByCategoriesOrPrice(List<CategoryDto> categoryDtos, Double priceFrom, Double priceTo,String name);
     List<ProductDto> getAll();
     List<ProductDto> getAllNotDeleted();
     Double getSaleOfProduct(Long productID);
+    List<ProductDto> getByName(String searchProduct);
 }

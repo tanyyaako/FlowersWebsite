@@ -10,12 +10,14 @@ public class CategoryEntity extends BaseEntity {
     private String name;
     private String description;
     private Set<ProductEntity> productEntities;
+    private CategoryType categoryType;
 
 
-    public CategoryEntity(String description, String name, Set<ProductEntity> productEntities) {
+    public CategoryEntity(String description, String name, Set<ProductEntity> productEntities,CategoryType categoryType) {
         this.description = description;
         this.name = name;
         this.productEntities = productEntities;
+        this.categoryType = categoryType;
     }
 
     protected CategoryEntity() {}
@@ -45,5 +47,16 @@ public class CategoryEntity extends BaseEntity {
 
     public void setProductEntities(Set<ProductEntity> productEntities) {
         this.productEntities = productEntities;
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category_type")
+    public CategoryType getCategoryType() {
+        return categoryType;
+    }
+
+
+    public void setCategoryType(CategoryType categoryType) {
+        this.categoryType = categoryType;
     }
 }

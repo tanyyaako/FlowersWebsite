@@ -150,26 +150,44 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDto> getByCategoriesOrPrice(List<CategoryDto> categoryDtos, Double priceFrom, Double priceTo) {
+    public List<ProductDto> getByCategoriesOrPrice(List<CategoryDto> categoryDtos, Double priceFrom, Double priceTo,String name) {
         List<CategoryEntity> categoryEntities = null;
-        if (categoryDtos != null) {
+        if (categoryDtos != null && !categoryDtos.isEmpty()) {
             categoryEntities = categoryDtos.stream()
                     .map(categoryDto -> modelMapper.map(categoryDto, CategoryEntity.class))
                     .toList();
         }
         List<ProductEntity> productEntities;
-        if (categoryDtos != null && priceFrom != null && priceTo != null) {
-            productEntities = productRepository.findByCategoriesInAndPriceBetween(categoryEntities, priceFrom, priceTo);
-        } else if (categoryDtos != null) {
-            productEntities = productRepository.findByCategories(categoryEntities);
-        } else if (priceFrom != null && priceTo != null) {
-            productEntities = productRepository.findAllByPriceBetween(priceFrom, priceTo);
-        } else if (priceFrom != null) {
-            productEntities = productRepository.findByPriceGreaterThanEqual(priceFrom);
-        } else if (priceTo != null) {
-            productEntities = productRepository.findByPriceLessThanEqual(priceTo);
+        if (name != null) {
+            if (categoryDtos != null && !categoryDtos.isEmpty() && priceFrom != null && priceTo != null) {
+                productEntities = productRepository.findByCategoriesInAndPriceBetweenAndNameContainingIgnoreCase(
+                        categoryEntities, priceFrom, priceTo, name);
+            } else if (categoryDtos != null && !categoryDtos.isEmpty()) {
+                productEntities = productRepository.findByCategoriesAndNameContainingIgnoreCase(categoryEntities, name);
+            } else if (priceFrom != null && priceTo != null) {
+                productEntities = productRepository.findAllByPriceBetweenAndNameContainingIgnoreCase(priceFrom, priceTo, name);
+            } else if (priceFrom != null) {
+                productEntities = productRepository.findByPriceGreaterThanEqualAndNameContainingIgnoreCase(priceFrom, name);
+                System.out.println("Calling name and pricefrom method!!!!!!");
+            } else if (priceTo != null) {
+                productEntities = productRepository.findByPriceLessThanEqualAndNameContainingIgnoreCase(priceTo, name);
+            } else {
+                productEntities = productRepository.findByNameContainingIgnoreCase(name);
+            }
         } else {
-            productEntities = productRepository.findAllIsNotDeleted();
+            if (categoryDtos != null && !categoryDtos.isEmpty() && priceFrom != null && priceTo != null) {
+                productEntities = productRepository.findByCategoriesInAndPriceBetween(categoryEntities, priceFrom, priceTo);
+            } else if (categoryDtos != null && !categoryDtos.isEmpty()) {
+                productEntities = productRepository.findByCategories(categoryEntities);
+            } else if (priceFrom != null && priceTo != null) {
+                productEntities = productRepository.findAllByPriceBetween(priceFrom, priceTo);
+            } else if (priceFrom != null) {
+                productEntities = productRepository.findByPriceGreaterThanEqual(priceFrom);
+            } else if (priceTo != null) {
+                productEntities = productRepository.findByPriceLessThanEqual(priceTo);
+            } else {
+                productEntities = productRepository.findAllIsNotDeleted();
+            }
         }
         List<ProductDto> productDtos = productEntities.stream()
                 .map(productEntity -> modelMapper.map(productEntity, ProductDto.class))
@@ -187,6 +205,21 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDto> getAllNotDeleted(){
         List<ProductEntity> productEntities = productRepository.findAllIsNotDeleted();
+        List<ProductDto> productDtos = productEntities.stream()
+                .map(productEntity -> modelMapper.map(productEntity,ProductDto.class))
+                .toList();
+        return productDtos;
+    }
+    @Override
+    public List<ProductDto> getByName(String searchProduct) {
+        if (searchProduct == null || searchProduct.isEmpty()) {
+            List<ProductEntity> productEntities=productRepository.findAll();
+            List<ProductDto> productDtos = productEntities.stream()
+                    .map(productEntity -> modelMapper.map(productEntity,ProductDto.class))
+                    .toList();
+            return productDtos;
+        }
+        List<ProductEntity> productEntities = productRepository.findByNameContainingIgnoreCase(searchProduct);
         List<ProductDto> productDtos = productEntities.stream()
                 .map(productEntity -> modelMapper.map(productEntity,ProductDto.class))
                 .toList();

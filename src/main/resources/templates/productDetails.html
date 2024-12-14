@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100px;
+            background-color: #4CAFF0;
+            color: white;
+            padding: 20px;
+        }
+
+        header .logo {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+        }
+
+        header img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        header nav {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+            margin-top: auto;
+        }
+
+        header nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        header nav a:hover {
+            background-color: #3a8cc4;
+        }
+
+        .container {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .product-details h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .product-details p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .product-details .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff5722;
+        }
+
+        .product-details .sale-price {
+            font-size: 18px;
+            color: #4caf50;
+            text-decoration: line-through;
+            margin-left: 10px;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .back-link:hover {
+            background: #0056b3;
+        }
+
+        footer {
+            margin-top: 20px;
+            padding: 20px;
+            text-align: center;
+            background-color: #4CAFF0;
+            color: white;
+        }
+        .catalog-button{
+            padding: 10px 15px;
+            background-color: #f4f4f4;
+            color: #3a8cc4;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+        .catalog-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img th:src="@{${baseView.logo}}" alt="Логотип">
+        </div>
+        <nav >
+            <a href="/product/catalog?categoryType=Flowers" class="catalog-button">Цветы</a>
+            <a href="/product/catalog?categoryType=Gifts" class="catalog-button">Подарки</a>
+            <a href="/product/catalog?categoryType=Celebration" class="catalog-button">Праздники</a>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="product-details">
+            <div class="product-image">
+                <img th:src="@{${product.url}}" alt="Изображение продукта">
+            </div>
+            <h1 th:text="${product.name}">Название продукта</h1>
+            <p>Цена: <span th:text="${product.price}">Цена</span> руб.</p>
+            <p th:if="${product.salePrice != null}">
+                Скидочная цена: <span th:text="${product.salePrice}">Скидочная цена</span> руб.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

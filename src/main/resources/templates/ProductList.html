@@ -47,13 +47,18 @@
         <a href="/category/listCategory">
             <button class="redirect to categoryList">Категории</button>
         </a>
+        <nav xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+            <form th:action="@{/users/logout}" method="post" sec:authorize="isAuthenticated()">
+                <button type="submit">Выход</button>
+            </form>
+        </nav>
                 <h1>Список продуктов</h1>
                 <div class="categories-container">
                     <div th:each="category : ${categories}" class="category-column">
                         <h2 th:text="${category.name}"></h2>
                         <div class="products-container">
-                            <div th:each="product : ${category.products}" class="product-card">
-                                <h3 th:text="${product.nameOfProduct}"></h3>
+                            <div th:each="product : ${products}" class="product-card" th:if="${product.categoryID == category.id}" >
+                                <h3 th:text="${product.name}"></h3>
                                 <p th:text="'Цена: ' + ${product.price}"></p>
                                 <p th:if="${product.salePrice > 0}" th:text="'Скидочная цена: ' + ${product.salePrice}"></p>
                                 <a th:href="@{/product/{id}/edit(id=${product.id})}">

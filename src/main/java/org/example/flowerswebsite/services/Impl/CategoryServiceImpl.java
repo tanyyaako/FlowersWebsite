@@ -3,6 +3,7 @@ package org.example.flowerswebsite.services.Impl;
 import org.example.flowerswebsite.DTO.CategoryDto;
 import org.example.flowerswebsite.DTO.ProductDto;
 import org.example.flowerswebsite.Entities.CategoryEntity;
+import org.example.flowerswebsite.Entities.CategoryType;
 import org.example.flowerswebsite.Entities.ProductEntity;
 import org.example.flowerswebsite.Exceptions.EntityNotFoundException;
 import org.example.flowerswebsite.Repositories.CategoryRepository;
@@ -37,6 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
         CategoryEntity categoryEntity = categoryRepository.findById(categoryDto.getId())
                 .orElseThrow(()-> new EntityNotFoundException("Category not found"));
         categoryEntity.setName(categoryDto.getName());
+        categoryEntity.setCategoryType(categoryDto.getType());
         CategoryEntity savedEntity = categoryRepository.save(categoryEntity);
         CategoryDto savedCategoryDto = modelmapper.map(savedEntity, CategoryDto.class);
         return savedCategoryDto;
@@ -54,6 +56,14 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryEntity> categoryEntities = categoryRepository.findAll();
         List<CategoryDto> categoryDtos = categoryEntities.stream()
                 .map(categoryEntity -> modelmapper.map(categoryEntity, CategoryDto.class))
+                .toList();
+        return categoryDtos;
+    }
+    @Override
+    public List<CategoryDto> getByCategoryType(CategoryType type){
+        List<CategoryEntity> categoryEntities = categoryRepository.findByCategoryType(type);
+        List<CategoryDto> categoryDtos=categoryEntities.stream()
+                .map(categoryEntity -> modelmapper.map(categoryEntity,CategoryDto.class))
                 .toList();
         return categoryDtos;
     }

@@ -48,6 +48,11 @@
         <a href="/product/list">
             <button class="redirect to productList">Товары</button>
         </a>
+        <nav xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+            <form th:action="@{/users/logout}" method="post" sec:authorize="isAuthenticated()">
+                <button type="submit">Выход</button>
+            </form>
+        </nav>
         <div th:if="${categories != null}">
             <h1>Категории</h1>
             <div class="category-cards-container">
@@ -66,11 +71,18 @@
         <div th:if="${categories == null and updateCategory == null}">
             <h1>Создание категории</h1>
             <div class="form-container">
-                <form action="/category/create" method="post">
+                <form  th:object="${form}" action="/category/create" method="post">
                     <label for="name">Название:</label>
                     <input type="text" id="name" name="name" required>
-                    <label for="description">Описание:</label>
-                    <textarea id="description" name="description"></textarea>
+<!--                    <label for="description">Описание:</label>-->
+<!--                    <textarea id="description" name="description"></textarea>-->
+                    <label for="categoryType">Тип категории:</label>
+                    <select id="categoryType" th:field="*{type}">
+                        <option th:each="type : ${categoryTypes}"
+                                th:value="${type}"
+                                th:text="${type}">
+                        </option>
+                    </select>
                     <button type="submit">Создать</button>
                 </form>
             </div>
@@ -83,6 +95,13 @@
                     <input type="text" id="name" name="name" th:value="${updateCategory.name}" required>
                     <label for="description">Описание:</label>
                     <textarea id="description" name="description" th:text="${updateCategory.description}"></textarea>
+                    <select id="categoryType" th:field="*{type}">
+                        <option th:each="type : ${categoryTypes}"
+                                th:value="${type}"
+                                th:text="${type}"
+                                th:selected="${type == updateCategory.type}">
+                        </option>
+                    </select>
                     <button type="submit">Обновить</button>
                 </form>
             </div>

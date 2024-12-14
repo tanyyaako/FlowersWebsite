@@ -1,4 +1,4 @@
-package org.example.flowerswebsite.Entities;
+package org.example.flowerswebsite.Entities.Enums;
 
 public enum OrderStatus {
     CREATED,

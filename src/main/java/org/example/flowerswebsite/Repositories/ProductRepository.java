@@ -35,6 +35,24 @@ public interface ProductRepository extends GeneralRepository<ProductEntity, Long
 
     @Query("SELECT p FROM ProductEntity p WHERE p.price <= :priceTo")
     List<ProductEntity> findByPriceLessThanEqual(@Param("priceTo") Double priceTo);
+    @Query("SELECT p FROM ProductEntity p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    List<ProductEntity> findByNameContainingIgnoreCase(@Param("name") String name);
+    @Query("SELECT p FROM ProductEntity p WHERE p.category IN :categories AND p.price >= :priceFrom AND p.price <= :priceTo AND LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    List<ProductEntity> findByCategoriesInAndPriceBetweenAndNameContainingIgnoreCase(@Param("categories") List<CategoryEntity> categories, @Param("priceFrom") Double priceFrom,
+                                                                                     @Param("priceTo") Double priceTo, @Param("name") String name);
+
+    @Query("SELECT p FROM ProductEntity p WHERE p.category IN :categories AND LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    List<ProductEntity> findByCategoriesAndNameContainingIgnoreCase(@Param("categories") List<CategoryEntity> categories, @Param("name") String name);
+
+    @Query("SELECT p FROM ProductEntity p WHERE p.price >= :priceFrom AND p.price <= :priceTo AND LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    List<ProductEntity> findAllByPriceBetweenAndNameContainingIgnoreCase(@Param("priceFrom") Double priceFrom, @Param("priceTo") Double priceTo,
+                                                                         @Param("name") String name);
+
+    @Query("SELECT p FROM ProductEntity p WHERE p.price >= :priceFrom AND LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    List<ProductEntity> findByPriceGreaterThanEqualAndNameContainingIgnoreCase(@Param("priceFrom") Double priceFrom, @Param("name") String name);
+
+    @Query("SELECT p FROM ProductEntity p WHERE p.price <= :priceTo AND LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    List<ProductEntity> findByPriceLessThanEqualAndNameContainingIgnoreCase(@Param("priceTo") Double priceTo, @Param("name") String name);
 
 
 }

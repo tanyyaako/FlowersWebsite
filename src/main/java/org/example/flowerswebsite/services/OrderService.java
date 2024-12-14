@@ -1,8 +1,7 @@
 package org.example.flowerswebsite.services;
 
 import org.example.flowerswebsite.DTO.OrderDto;
-import org.example.flowerswebsite.Entities.OrderStatus;
-import org.springframework.http.ResponseEntity;
+import org.example.flowerswebsite.Entities.Enums.OrderStatus;
 
 import java.util.List;
 
