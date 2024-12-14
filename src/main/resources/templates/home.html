@@ -152,6 +152,9 @@
       <form th:action="@{/users/profile}" method="get" sec:authorize="isAuthenticated()">
         <button type="submit">Профиль</button>
       </form>
+      <form th:action="@{/order/cart}" method="get" sec:authorize="isAuthenticated()">
+        <button type="submit">Корзина</button>
+      </form>
       <a href="/product/catalog?categoryType=Flowers" class="catalog-button">Цветы</a>
       <a href="/product/catalog?categoryType=Gifts" class="catalog-button">Подарки</a>
       <a href="/product/catalog?categoryType=Celebration" class="catalog-button">Праздники</a>

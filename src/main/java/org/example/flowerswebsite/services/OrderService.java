@@ -1,13 +1,11 @@
 package org.example.flowerswebsite.services;
 
 import org.example.flowerswebsite.DTO.OrderDto;
-import org.example.flowerswebsite.Entities.Enums.OrderStatus;
 
 import java.util.List;
 
 public interface OrderService {
-    OrderDto createOrder(OrderDto orderDto);
-    OrderDto updateOrderStatus(Long id, OrderStatus orderStatus);
+    void createOrder(String userId);
     OrderDto findById(Long id);
-    List<OrderDto> findAllActive();
+    List<OrderDto> findAll();
 }
