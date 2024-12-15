@@ -137,60 +137,72 @@
       background-color: #0056b3;
     }
   </style>
-<body>
-  <header>
-    <div class="logo">
-      <img th:src="@{${baseView.logo}}" alt="Логотип">
+  <body>
+    <header>
+      <div class="logo">
+        <img th:src="@{${baseView.logo}}" alt="Логотип">
+      </div>
+      <nav xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+        <form th:action="@{/users/logout}" method="post" sec:authorize="isAuthenticated()" onsubmit="return confirmLogout()">
+          <button type="submit">Выход</button>
+        </form>
+        <form th:action="@{/users/login}" method="post" sec:authorize="!isAuthenticated()">
+          <button type="submit">Войти</button>
+        </form>
+        <form th:action="@{/users/profile}" method="get" sec:authorize="isAuthenticated()">
+          <button type="submit">Профиль</button>
+        </form>
+        <form th:action="@{/order/cart}" method="get" sec:authorize="isAuthenticated()">
+          <button type="submit">Корзина</button>
+        </form>
+        <a href="/product/catalog?categoryType=Flowers" class="catalog-button">Цветы</a>
+        <a href="/product/catalog?categoryType=Gifts" class="catalog-button">Подарки</a>
+        <a href="/product/catalog?categoryType=Celebration" class="catalog-button">Праздники</a>
+      </nav>
+    </header>
+    <div>
+
+      <section>
+        <h2>Бестселлеры</h2>
+        <div>
+          <ul>
+            <li th:each="bestSeller : ${bestsellers}">
+              <img th:src="@{${bestSeller.productView.url}}" alt="Изображение" >
+              <h3 th:text="${bestSeller.productView.name}">Название</h3>
+              <p th:text="${bestSeller.productView.price}">Цена</p>
+              <form th:action="@{/product/{id}/details(id=${bestSeller.productView.id})}" method="get">
+                <button type="submit">Подробнее</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Акции</h2>
+        <div>
+          <ul>
+            <li th:each="sale : ${sales}">
+              <img th:src="@{${sale.url}}" alt="Изображение продукта" style="width: 100px;">
+              <h3 th:text="${sale.name}"></h3>
+              <h3 th:text="'Старая цена: '+${sale.price}"></h3>
+              <h3 th:text="'Новая цена: '+${sale.salePrice}"></h3>
+              <form th:action="@{/product/{id}/details(id=${sale.id})}" method="get">
+                <button type="submit">Подробнее</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </section>
     </div>
-    <nav xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-      <form th:action="@{/users/logout}" method="post" sec:authorize="isAuthenticated()">
-        <button type="submit">Выход</button>
-      </form>
-      <form th:action="@{/users/login}" method="post" sec:authorize="!isAuthenticated()">
-        <button type="submit">Войти</button>
-      </form>
-      <form th:action="@{/users/profile}" method="get" sec:authorize="isAuthenticated()">
-        <button type="submit">Профиль</button>
-      </form>
-      <form th:action="@{/order/cart}" method="get" sec:authorize="isAuthenticated()">
-        <button type="submit">Корзина</button>
-      </form>
-      <a href="/product/catalog?categoryType=Flowers" class="catalog-button">Цветы</a>
-      <a href="/product/catalog?categoryType=Gifts" class="catalog-button">Подарки</a>
-      <a href="/product/catalog?categoryType=Celebration" class="catalog-button">Праздники</a>
-    </nav>
-  </header>
-  <div>
+    <footer>
+      <p th:text="${baseView.aboutUsInformation}">Информация о нас</p>
+    </footer>
+  </body>
+  <script>
+    function confirmLogout() {
+      return confirm("Вы действительно хотите выйти?");
+    }
+  </script>
 
-    <section>
-      <h2>Бестселлеры</h2>
-      <div>
-        <ul>
-          <li th:each="bestSeller : ${bestsellers}">
-            <img th:src="@{${bestSeller.productView.url}}" alt="Изображение" >
-            <h3 th:text="${bestSeller.productView.name}">Название</h3>
-            <p th:text="${bestSeller.productView.price}">Цена</p>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <section>
-      <h2>Акции</h2>
-      <div>
-        <ul>
-          <li th:each="sale : ${sales}">
-            <img th:src="@{${sale.url}}" alt="Изображение продукта" style="width: 100px;">
-            <h3 th:text="${sale.name}"></h3>
-            <h3 th:text="'Старая цена: '+${sale.price}"></h3>
-            <h3 th:text="'Новая цена: '+${sale.salePrice}"></h3>
-          </li>
-        </ul>
-      </div>
-    </section>
-  </div>
-  <footer>
-    <p th:text="${baseView.aboutUsInformation}">Информация о нас</p>
-  </footer>
-</body>
 </html>

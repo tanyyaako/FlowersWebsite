@@ -6,6 +6,7 @@
 <body>
 
 <h1>Корзина покупок</h1>
+<a href="/home" class="back-button">Назад</a>
 
 <div th:if="${cartItems == null}">
     <p th:text="${message}">Корзина пуста</p>
@@ -25,6 +26,18 @@
             <td th:text="${item.productName}"></td>
             <td th:text="${item.quantity}"></td>
             <td th:text="${item.price}"></td>
+            <td>
+                <form th:action="@{/order/cart/add}" method="post">
+                    <input type="hidden" name="productId" th:value="${item.productId}" />
+                    <input type="hidden" name="quantity" value="1" />
+                    <button tye="submit">+</button>
+
+                </form>
+                <form th:action="@{/order/cart/decrease}" method="post">
+                    <input type="hidden" name="productId" th:value="${item.productId}" />
+                    <button type="submit">-</button>
+                </form>
+            </td>
         </tr>
         </tbody>
     </table>

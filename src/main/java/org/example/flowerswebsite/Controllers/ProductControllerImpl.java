@@ -3,6 +3,7 @@ package org.example.flowerswebsite.Controllers;
 import jakarta.validation.Valid;
 import org.example.controllers.Product.ProductController;
 import org.example.flowerswebsite.DTO.CategoryDto;
+import org.example.flowerswebsite.DTO.PageDto;
 import org.example.flowerswebsite.DTO.ProductDto;
 import org.example.flowerswebsite.Entities.CategoryEntity;
 import org.example.flowerswebsite.Entities.CategoryType;
@@ -14,6 +15,9 @@ import org.example.viewModel.Category.CategoryView;
 import org.example.viewModel.Product.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -45,28 +49,25 @@ public class ProductControllerImpl implements ProductController {
     @GetMapping("/catalog")
     public String catalog(
             @RequestParam(required = false) String categoryType,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             Model model) {
         String logoPath = "/images/logo.jpg";
         BaseView baseView = new BaseView(logoPath, "Мы продаём цветы 5 лет");
         model.addAttribute("baseView", baseView);
-
         List<CategoryDto> categoryDtos = categoryService.getByCategoryType(CategoryType.valueOf(categoryType.toUpperCase()));
-        List<ProductView> allProductViews = new ArrayList<>();
-        for (CategoryDto categoryDto : categoryDtos) {
-            List<ProductDto> productDtos = productService.getAllByCategory(categoryDto.getId());
-            List<ProductView> productViews = productDtos.stream()
-                    .map(productDto -> modelMapper.map(productDto,ProductView.class))
-                    .toList();
-            allProductViews.addAll(productViews);
-        }
+        PageDto<ProductDto> productPage = productService.getPageProductsByCategories(
+                categoryDtos.stream().map(CategoryDto::getId).toList(), page, size,categoryType);
         List<CategoryView> categoryViews = categoryDtos.stream()
                 .map(categoryDto -> modelMapper.map(categoryDto,CategoryView.class))
                 .toList();
         ProductSearchForm productSearchForm = new ProductSearchForm();
         model.addAttribute("form", new CatalogPageViewForm(baseView,new ArrayList<>(),new ArrayList<>(),productSearchForm,categoryType));
         model.addAttribute("categories",categoryViews);
-        model.addAttribute("products",allProductViews);
+        model.addAttribute("products",productPage);
         model.addAttribute("categoryType", categoryType);
+        model.addAttribute("currentPage", productPage.getPageNumber());
+        model.addAttribute("totalPages", productPage.getTotalPages());
 
         return "catalog.html";
     }
@@ -75,6 +76,8 @@ public class ProductControllerImpl implements ProductController {
     @PostMapping("/catalog")
     public String catalog(
                           @ModelAttribute("form") CatalogPageViewForm form,
+                          @RequestParam(defaultValue = "0") int page,
+                          @RequestParam(defaultValue = "10") int size,
                           Model model){
         String logoPath = "/images/logo.jpg";
         BaseView baseView = new BaseView(logoPath, "Мы продаём цветы 5 лет");
@@ -90,27 +93,24 @@ public class ProductControllerImpl implements ProductController {
         for (CategoryView categoryView: categoryViews) {
             categoryIds.add(categoryView.getId());
         }
-        List<CategoryView> selectedCategoryViews = new ArrayList<>();
-        if (searchForm.getCategoryViews() != null && !searchForm.getCategoryViews().isEmpty()) {
-            selectedCategoryViews = searchForm.getCategoryViews();
+        List<CategoryDto> selectedCategoryDtos= new ArrayList<>();
+        if (searchForm.getCategoryIds() != null && !searchForm.getCategoryIds().isEmpty()) {
+             selectedCategoryDtos = form.productSearchForm().getCategoryIds().stream()
+                    .map(categoryId -> categoryService.findById(categoryId))
+                    .toList();
         }
-
-        List<CategoryDto> selectedCategoryDtos = selectedCategoryViews.stream()
-                .map(selectedCategoryView -> modelMapper.map(selectedCategoryView,CategoryDto.class))
-                .toList();
-        List<ProductDto> filteredProducts = productService.getByCategoriesOrPrice(
+        Page<ProductDto> filteredProducts = productService.getByCategoriesOrPrice(
                 selectedCategoryDtos,
                 searchForm.getFromPrice(),
                 searchForm.getToPrice(),
-                searchForm.getSearchProduct()
+                searchForm.getSearchProduct(),
+                page,
+                size
         );
 
-        List<ProductView> productViews = filteredProducts.stream()
-                .map(filteredProduct-> modelMapper.map(filteredProduct,ProductView.class))
-                .toList();
         List<Long> productIds = new ArrayList<>();
-        for (ProductView productView: productViews){
-            productIds.add(productView.getId());
+        for (ProductDto productDto: filteredProducts){
+            productIds.add(productDto.getId());
         }
         form = new CatalogPageViewForm(
                 form.baseView(),
@@ -122,7 +122,9 @@ public class ProductControllerImpl implements ProductController {
 
         model.addAttribute("form", form);
         model.addAttribute("categories",categoryViews);
-        model.addAttribute("products",productViews);
+        model.addAttribute("products",filteredProducts);
+        model.addAttribute("currentPage", filteredProducts.getNumber());
+        model.addAttribute("totalPages", filteredProducts.getTotalPages());
 
         return "catalog.html";
     }
@@ -135,16 +137,11 @@ public class ProductControllerImpl implements ProductController {
         String logoPath = "/images/logo.jpg";
         BaseView baseView = new BaseView(logoPath, "Мы продаём цветы 5 лет");
         model.addAttribute("baseView", baseView);
-
-        System.out.println("categoryType from form: " + form.categoryType());
-
         ProductDto productDto = productService.getById(id);
         ProductView productView=new ProductView(productDto.getId(),productDto.getName(),productDto.getPrice(),
                 productDto.getUrl(),productDto.getCategoryId(),productDto.getSalePrice());
-        System.out.println(form.categoryType());
         ProductSearchForm productSearchForm = new ProductSearchForm();
         String categoryType = form.categoryType();
-        System.out.println("type in details "+ categoryType);
         model.addAttribute("categoryType", categoryType);
         model.addAttribute("form", new CatalogPageViewForm(baseView, new ArrayList<>(), new ArrayList<>(), productSearchForm, categoryType));
         model.addAttribute("product", productView);
@@ -162,10 +159,31 @@ public class ProductControllerImpl implements ProductController {
         List<CategoryView> categoryViews = categories.stream()
                 .map(category -> modelMapper.map(category,CategoryView.class))
                 .toList();
+        ProductSearchForm productSearchForm = new ProductSearchForm();
+        model.addAttribute("form", new AdminSearchForm(new ArrayList<>(),new ArrayList<>(),productSearchForm));
         model.addAttribute("categories",categoryViews);
         model.addAttribute("products",productViews);
         return "ProductList.html";
     }
+    @Override
+    @PostMapping("/list")
+    public String listProducts(Model model,
+                               @ModelAttribute("form") AdminSearchForm form) {
+        List<CategoryDto> categories = categoryService.getAll();
+        List<ProductDto> products = productService.getAllNotDeleted();
+        List<ProductView> productViews =products.stream()
+                .map(product -> modelMapper.map(product,ProductView.class))
+                .toList();
+        List<CategoryView> categoryViews = categories.stream()
+                .map(category -> modelMapper.map(category,CategoryView.class))
+                .toList();
+        ProductSearchForm productSearchForm = new ProductSearchForm();
+        model.addAttribute("form", new AdminSearchForm(new ArrayList<>(),new ArrayList<>(),productSearchForm));
+        model.addAttribute("categories",categoryViews);
+        model.addAttribute("products",productViews);
+        return "ProductList.html";
+    }
+
 
     @Override
     @GetMapping("/create")
@@ -189,7 +207,6 @@ public class ProductControllerImpl implements ProductController {
         productDto.setPrice(form.getPrice());
         productDto.setQuantityProduct(form.getQuantityProduct());
         productDto.setCategoryId(form.getCategoryID());
-        System.out.println(productDto.getCategoryId());
         productDto.setDescription(form.getDescription());
         productService.createProduct(productDto);
         return "redirect:/product/list";
@@ -240,16 +257,5 @@ public class ProductControllerImpl implements ProductController {
     public String delete(@PathVariable Long id) {
         productService.delete(id);
         return "redirect:/product/list";
-    }
-
-    private ProductView convertToProductView(ProductDto productDto) {
-        return new ProductView(
-                productDto.getId(),
-                productDto.getName(),
-                productDto.getPrice(),
-                productDto.getUrl(),
-                productDto.getCategoryId(),
-                productDto.getSalePrice()
-        );
     }
 }

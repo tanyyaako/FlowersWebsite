@@ -37,7 +37,7 @@ public class AppSecurityConfiguration {
                                         .requestMatchers("/error").permitAll()
                                         .requestMatchers("/home", "/users/login", "/users/register", "/users/login-error")
                                         .permitAll().
-                                        requestMatchers("/product/catalog").authenticated().
+                                        requestMatchers("/product/catalog","/order/cart","order/checkout","/order/clear","/order/cart/add").authenticated().
                                         requestMatchers("/product/create","/product/list", "/product//{id}/edit","product/{id}/delete","/category/create","/category/listCategory", "/product//{id}/edit").hasRole(UserRoleEnum.ADMIN.name()).
                                         anyRequest().authenticated()
                 )

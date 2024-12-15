@@ -135,28 +135,34 @@
         }
     </style>
 </head>
-<body>
-    <header>
-        <div class="logo">
-            <img th:src="@{${baseView.logo}}" alt="Логотип">
-        </div>
-        <nav >
-            <a href="/product/catalog?categoryType=Flowers" class="catalog-button">Цветы</a>
-            <a href="/product/catalog?categoryType=Gifts" class="catalog-button">Подарки</a>
-            <a href="/product/catalog?categoryType=Celebration" class="catalog-button">Праздники</a>
-        </nav>
-    </header>
-    <div class="container">
-        <div class="product-details">
-            <div class="product-image">
-                <img th:src="@{${product.url}}" alt="Изображение продукта">
+    <body>
+        <header>
+            <div class="logo">
+                <img th:src="@{${baseView.logo}}" alt="Логотип">
             </div>
-            <h1 th:text="${product.name}">Название продукта</h1>
-            <p>Цена: <span th:text="${product.price}">Цена</span> руб.</p>
-            <p th:if="${product.salePrice != null}">
-                Скидочная цена: <span th:text="${product.salePrice}">Скидочная цена</span> руб.
-            </p>
+            <nav >
+                <a href="/product/catalog?categoryType=Flowers" class="catalog-button">Цветы</a>
+                <a href="/product/catalog?categoryType=Gifts" class="catalog-button">Подарки</a>
+                <a href="/product/catalog?categoryType=Celebration" class="catalog-button">Праздники</a>
+            </nav>
+        </header>
+        <div class="container">
+            <div class="product-details">
+                <div class="product-image">
+                    <img th:src="@{${product.url}}" alt="Изображение продукта">
+                </div>
+                <h1 th:text="${product.name}">Название продукта</h1>
+                <p>Цена: <span th:text="${product.price}">Цена</span> руб.</p>
+                <p th:if="${product.salePrice != null}">
+                    Скидочная цена: <span th:text="${product.salePrice}">Скидочная цена</span> руб.
+                </p>
+                <form th:action="@{/order/cart/add}" method="post">
+                    <input type="hidden" name="productId" th:value="${product.id}">
+                    <input type="hidden" name="returnUrl" th:value="@{'/product/' + ${product.id} + '/details'}" />
+                    <input type="number" name="quantity" value="1" min="1" style="width: 50px;">
+                    <button type="submit">Добавить в корзину</button>
+                </form>
+            </div>
         </div>
-    </div>
-</body>
+    </body>
 </html>

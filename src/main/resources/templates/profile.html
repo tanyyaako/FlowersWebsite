@@ -11,9 +11,9 @@
                 </div>
                 <div class="row bg-light rounded">
                     <div class="col-md-6" th:object="${user}">
-                        <h4 th:text="'Username: ' + *{username}"></h4>
+                        <h4 th:text="'Username: ' + *{email}"></h4>
                         <h4 th:text="'Номер телефона: ' + *{phoneNumber}"></h4>
-                        <h4 th:text="'Email: ' + *{email}"></h4>
+                        <h4 th:text="'Email: ' + *{username}"></h4>
                         <a href="/home" class="back-button">Назад</a>
                     </div>
                 </div>

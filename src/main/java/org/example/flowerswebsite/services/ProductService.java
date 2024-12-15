@@ -1,7 +1,9 @@
 package org.example.flowerswebsite.services;
 
 import org.example.flowerswebsite.DTO.CategoryDto;
+import org.example.flowerswebsite.DTO.PageDto;
 import org.example.flowerswebsite.DTO.ProductDto;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -17,9 +19,11 @@ public interface ProductService {
     List<ProductDto> getSaleProducts();
     void deleteSale(Long productID);
     List<ProductDto> getTopSelling();
-    List<ProductDto> getByCategoriesOrPrice(List<CategoryDto> categoryDtos, Double priceFrom, Double priceTo,String name);
+    Page<ProductDto> getByCategoriesOrPrice(List<CategoryDto> categoryDtos, Double priceFrom,
+                                            Double priceTo,String name,int page,int size);
     List<ProductDto> getAll();
     List<ProductDto> getAllNotDeleted();
     Double getSaleOfProduct(Long productID);
-    List<ProductDto> getByName(String searchProduct);
+//    List<ProductDto> getByName(String searchProduct);
+    PageDto<ProductDto> getPageProductsByCategories(List<Long> categoryIds, int page, int size, String categoryType);
 }

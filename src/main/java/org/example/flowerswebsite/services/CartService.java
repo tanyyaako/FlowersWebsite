@@ -16,12 +16,13 @@ public class CartService {
     public Map<String, Long> getCart(String userId){
         return redisService.get("cart:" + userId);
     }
-    public void addToCart(String userId, String productId, int quantity){
+    public void addToCart(String userId, String productId, Integer quantity){
         String key="cart:" + userId;
         Map<String, Long> cart = getCart(userId);
         if (cart == null) {
             cart = new HashMap<>();
         }
+        long incr = (quantity == null) ? 1 : quantity;
         cart.put(productId, cart.getOrDefault(productId, 0L) + quantity);
         redisService.save(key, cart);
     }
@@ -29,5 +30,19 @@ public class CartService {
     public  void clearCart(String userId){
         String key="cart:" + userId;
         redisService.remove(key);
+    }
+    public void decreaseQuantity(String userId, String productId) {
+        String key = "cart:" + userId;
+        Map<String, Long> cart = getCart(userId);
+
+        if (cart != null && cart.containsKey(productId)) {
+            Long currentQuantity = cart.get(productId);
+            if (currentQuantity > 1) {
+                cart.put(productId, currentQuantity - 1);
+            } else {
+                cart.remove(productId);
+            }
+            redisService.save(key, cart);
+        }
     }
 }

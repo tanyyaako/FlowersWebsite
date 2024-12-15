@@ -73,10 +73,10 @@ public class OrderControllerImpl implements OrderController {
                 ProductDto productDto= productServiceImpl.getById(productId);
                 if(productDto.getSalePrice()!=null && productDto.getSalePrice()!=0){
                     totalPrice+=quantity*productDto.getSalePrice();
-                    itemsView.add(new CartItemView(productDto.getName(),quantity,productDto.getSalePrice()));
+                    itemsView.add(new CartItemView(String.valueOf(productId),productDto.getName(),quantity,productDto.getSalePrice()));
                 }else{
                     totalPrice+=quantity*productDto.getPrice();
-                    itemsView.add(new CartItemView(productDto.getName(),quantity,productDto.getPrice()));
+                    itemsView.add(new CartItemView(String.valueOf(productId),productDto.getName(),quantity,productDto.getPrice()));
                 }
             }
         }
@@ -89,14 +89,21 @@ public class OrderControllerImpl implements OrderController {
     @Override
     @PostMapping("/cart/add")
     public String addCart(@AuthenticationPrincipal User user,
-                          @RequestParam  Long productId,@RequestParam int quantity,
-                          Model model, @RequestParam String categoryType) {
+                          @RequestParam  Long productId,@RequestParam(required = false) Integer quantity,
+                          Model model, @RequestParam(required = false)   String categoryType,
+                          @RequestParam(required = false) String returnUrl) {
         String logoPath = "/images/logo.jpg";
         BaseView baseView = new BaseView(logoPath, "Мы продаём цветы 5 лет");
         model.addAttribute("baseView", baseView);
         String username = user.getUsername();
         UserEntity userEntity = authService.getUser(username);
         cartService.addToCart(String.valueOf(userEntity.getId()), String.valueOf(productId), quantity);
+        if (returnUrl != null && !returnUrl.isEmpty()) {
+            return "redirect:" + returnUrl;
+        }
+        if (categoryType == null || categoryType.isEmpty()) {
+            return "redirect:/order/cart?";
+        }
         return "redirect:/product/catalog?categoryType=" + categoryType;
     }
 
@@ -118,10 +125,19 @@ public class OrderControllerImpl implements OrderController {
         try {
             System.out.println("created");
             orderService.createOrder(userId);
-            return "redirect:/order/cart?";
+            return "succesOrder.html";
         } catch (Exception e) {
             System.out.println("not created"+ e.getMessage());
             return "redirect:/cart?";
         }
+    }
+    @Override
+    @PostMapping("/cart/decrease")
+    public String decreaseQuantity(@AuthenticationPrincipal User user, @RequestParam Long productId,Model model){
+        String username = user.getUsername();
+        UserEntity userEntity = authService.getUser(username);
+        String userId= String.valueOf(userEntity.getId());
+        cartService.decreaseQuantity(userId, String.valueOf(productId));
+        return "redirect:/order/cart?";
     }
 }

@@ -155,6 +155,9 @@
             <form th:action="@{/order/cart}" method="get" sec:authorize="isAuthenticated()">
                 <button type="submit">Корзина</button>
             </form>
+            <form th:action="@{/users/profile}" method="get" sec:authorize="isAuthenticated()">
+                <button type="submit">Профиль</button>
+            </form>
         </nav>
 
     </header>
@@ -169,7 +172,7 @@
                 <h3>Выберите категории:</h3>
                 <div th:each="category : ${categories}">
                     <label>
-                        <input type="checkbox" name="productSearchForm.categoryViews[0].id" th:value="${category.getId()}" />
+                        <input type="checkbox" name="productSearchForm.categoryIds" th:value="${category.getId()}" />
                         <span th:text="${category.name}"></span>
                     </label><br />
                 </div>
@@ -181,8 +184,8 @@
         <main class="content">
             <h1>Каталог</h1>
             <div class="product-list">
-                <th:block th:if="${products != null and !products.isEmpty()}">
-                    <th:block th:each="product : ${products}">
+                <th:block th:if="${products.content != null }">
+                    <th:block th:each="product : ${products.content}">
                         <div class="product-card">
                             <h3 th:text="${product.name}">Название продукта</h3>
                             <p>Цена: <span th:text="${product.price}">Цена</span> руб.</p>
@@ -202,7 +205,16 @@
                         </div>
                     </th:block>
                 </th:block>
-                <p th:if="${products == null || products.isEmpty()}">Продукты не найдены</p>
+                <p th:if="${products == null }">Продукты не найдены</p>
+            </div>
+            <div class="pagination">
+                <a th:href="@{/catalog(page=${currentPage - 1}, size=${size}, categoryType=${categoryType})}"
+                   th:if="${currentPage > 0}">Назад</a>
+
+                <span>Страница: <span th:text="${currentPage + 1}"></span> из <span th:text="${totalPages}"></span></span>
+
+                <a th:href="@{/catalog(page=${currentPage + 1}, size=${size}, categoryType=${categoryType})}"
+                   th:if="${currentPage < totalPages - 1}">Вперёд</a>
             </div>
         </main>
     </div>
