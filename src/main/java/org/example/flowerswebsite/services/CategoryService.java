@@ -12,5 +12,4 @@ public interface CategoryService {
     CategoryDto findById(Long id);
     List<CategoryDto> getAll();
     List<CategoryDto> getByCategoryType(CategoryType type);
-
 }

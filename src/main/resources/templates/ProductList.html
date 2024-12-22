@@ -1,80 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>ProductList</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<style>
-    .container {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
 
-    .categories-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-    }
+    <body>
+    <div class="container my-5">
+        <div class="d-flex gap-3 mb-4">
+            <a href="/product/create">
+                <button class="btn btn-primary btn-sm">Создать продукт</button>
+            </a>
+            <a href="/category/listCategory">
+                <button class="btn btn-secondary btn-sm">Категории</button>
+            </a>
+            <nav xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+                <form th:action="@{/users/logout}" method="post" sec:authorize="isAuthenticated()">
+                    <button type="submit" class="btn btn-danger btn-sm">Выход</button>
+                </form>
+            </nav>
+        </div>
 
-    .category-column {
-        flex: 1;
-        border: 1px solid #ddd;
-        padding: 10px;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-    }
+        <h1 class="mb-4">Список товаров</h1>
 
-    .product-card {
-        margin-bottom: 15px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #fff;
-    }
-    .product-card button {
-        margin-right: 10px;
-        margin-left: 10px;
-        margin-top: 15px;
-        padding: 10px 20px;
-    }
-</style>
-<body>
-    <div class="container">
-        <a href="/product/create">
-            <button class="add-product-button">Создать продукт</button>
-        </a>
-        <a href="/category/listCategory">
-            <button class="redirect to categoryList">Категории</button>
-        </a>
-        <nav xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-            <form th:action="@{/users/logout}" method="post" sec:authorize="isAuthenticated()">
-                <button type="submit">Выход</button>
-            </form>
-        </nav>
-                <h1>Список продуктов</h1>
-                <div class="categories-container">
-                    <div th:each="category : ${categories}" class="category-column">
-                        <h2 th:text="${category.name}"></h2>
-                        <div class="products-container">
-                            <div th:each="product : ${products}" class="product-card" th:if="${product.categoryID == category.id}" >
-                                <h3 th:text="${product.name}"></h3>
-                                <p th:text="'Цена: ' + ${product.price}"></p>
-                                <p th:if="${product.salePrice > 0}" th:text="'Скидочная цена: ' + ${product.salePrice}"></p>
-                                <a th:href="@{/product/{id}/edit(id=${product.id})}">
-                                    <button>Редактировать</button>
-                                </a>
-                                <a th:href="@{/product/{id}/delete(id=${product.id})}"
-                                   onclick="return confirm('Вы уверены, что хотите удалить этот продукт?');">
-                                    <button>Удалить</button>
-                                </a>
-                            </div>
-                        </div>
+        <form th:action="@{/product/list}" method="post" th:object="${form}">
+            <div class="search-form card p-4 mb-4">
+                <h3 class="mb-4">Фильтр товаров</h3>
+
+                <div class="mb-3">
+                    <label for="searchProduct" class="form-label">Поиск по товарам:</label>
+                    <input type="text" id="searchProduct" name="productSearchForm.searchProduct" placeholder="Поиск товара" th:value="${form.productSearchForm.searchProduct}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="fromPrice" class="form-label">Цена от:</label>
+                    <input type="number" id="fromPrice" name="productSearchForm.fromPrice" placeholder="Цена от" th:value="${form.productSearchForm.fromPrice}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="toPrice" class="form-label">Цена до:</label>
+                    <input type="number" id="toPrice" name="productSearchForm.toPrice" placeholder="Цена до" th:value="${form.productSearchForm.toPrice}">
+                </div>
+
+                <h4 class="mb-3">Выберите категории:</h4>
+                <div th:each="category : ${categories}">
+                    <div class="form-check">
+                        <input type="checkbox" name="productSearchForm.categoryIds" th:value="${category.id}" class="form-check-input" />
+                        <label class="form-check-label" th:text="${category.name}"></label>
                     </div>
                 </div>
+
+                <button type="submit" class="btn btn-primary mt-3">Поиск</button>
+                <a href="/product/list" class="btn btn-secondary mt-3">Очистить форму</a>
+
             </div>
+        </form>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Название товара</th>
+                    <th>Цена</th>
+                    <th>Категория</th>
+                    <th>Скидка</th>
+                    <th>Ссылка</th>
+                    <th>Количество</th>
+                    <th>Действия</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="product : ${products}">
+                    <td th:text="${product.name}"></td>
+                    <td th:text="${product.price}"></td>
+                    <td>
+                        <span th:each="category : ${categories}" th:if="${category.id == product.categoryID}" th:text="${category.name}"></span>
+                    </td>
+                    <td th:if="${product.salePrice > 0}" th:text="${product.salePrice}"></td>
+                    <td th:if="${product.salePrice == null or product.salePrice == 0}">-</td>
+                    <td th:if="${product.url != null and product.url != ''}" th:text="${product.url}"></td>
+                    <td th:if="${product.url == null or product.url == ''}">-</td>
+                    <td th:if="${product.quantityProduct > 0}" th:text="${product.quantityProduct}"></td>
+                    <td th:if="${product.quantityProduct < 0 }">-</td>
+                    <td>
+                        <a th:href="@{/product/{id}/edit(id=${product.id})}">
+                            <button class="btn btn-warning">Редактировать</button>
+                        </a>
+                        <a th:href="@{/product/{id}/delete(id=${product.id})}"
+                           onclick="return confirm('Вы уверены, что хотите удалить этот продукт?');">
+                            <button class="btn btn-danger">Удалить</button>
+                        </a>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
-</body>
+    </body>
 
 </html>

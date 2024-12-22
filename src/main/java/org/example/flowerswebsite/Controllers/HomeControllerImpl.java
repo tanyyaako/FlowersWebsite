@@ -1,5 +1,8 @@
 package org.example.flowerswebsite.Controllers;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.controllers.Home.HomeController;
 import org.example.flowerswebsite.DTO.ProductDto;
 import org.example.flowerswebsite.services.ProductService;
@@ -12,12 +15,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
 @RequestMapping("/")
 public class HomeControllerImpl implements HomeController {
 
+    private static final Logger LOG = LogManager.getLogger(Controller.class);
     private final ProductService productService;
 
     public HomeControllerImpl(ProductService productService) {
@@ -31,7 +36,8 @@ public class HomeControllerImpl implements HomeController {
 
     @Override
     @GetMapping("/home")
-    public String homePage(Model model) {
+    public String homePage(Principal principal, Model model) {
+        LOG.log(Level.INFO,"Home page request from "+ (principal != null ? principal.getName() : "not_authenticated"));
         String logoPath = "/images/logo.jpg";
         BaseView baseView = new BaseView(logoPath, "Мы продаём цветы 5 лет");
         model.addAttribute("baseView", baseView);
@@ -45,7 +51,8 @@ public class HomeControllerImpl implements HomeController {
                                 productDto.getPrice(),
                                 "/images/products/" + productDto.getId() + ".jpg",
                                 productDto.getCategoryId(),
-                                productDto.getSalePrice()
+                                productDto.getSalePrice(),
+                                productDto.getQuantityProduct()
                         ),
                         baseView
                 ))
@@ -60,7 +67,9 @@ public class HomeControllerImpl implements HomeController {
                         saleProductDTO.getPrice(),
                         "/images/products/" + saleProductDTO.getId() + ".jpg",
                         saleProductDTO.getCategoryId(),
-                        saleProductDTO.getSalePrice()
+                        saleProductDTO.getSalePrice(),
+                        saleProductDTO.getQuantityProduct()
+
                 ))
                 .toList();
 

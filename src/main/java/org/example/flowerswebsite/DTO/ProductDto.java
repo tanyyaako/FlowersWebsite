@@ -5,14 +5,14 @@ public class ProductDto {
     private String name;
     private String description;
     private Double price;
-    private Long categoryId;
+    private Long categoryID;
     private Double salePrice;
     private Double quantityProduct;
     private String url;
 
-    public ProductDto(Long categoryId, String description, String name, Double price,
+    public ProductDto(Long categoryID, String description, String name, Double price,
                       Long id, Double salePrice, Double quantityProduct, String url) {
-        this.categoryId = categoryId;
+        this.categoryID = categoryID;
         this.description = description;
         this.name = name;
         this.price = price;
@@ -24,11 +24,11 @@ public class ProductDto {
     public ProductDto() {}
 
     public Long getCategoryId() {
-        return categoryId;
+        return categoryID;
     }
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setCategoryId(Long categoryID) {
+        this.categoryID = categoryID;
     }
 
     public String getDescription() {

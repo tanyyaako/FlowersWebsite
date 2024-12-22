@@ -1,5 +1,8 @@
 package org.example.flowerswebsite.Controllers;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.controllers.Order.OrderController;
 import org.example.flowerswebsite.DTO.OrderDto;
 import org.example.flowerswebsite.DTO.ProductDto;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +38,7 @@ public class OrderControllerImpl implements OrderController {
     private final CartService cartService;
     private final AuthService authService;
     private final ProductServiceImpl productServiceImpl;
+    private static final Logger LOG = LogManager.getLogger(Controller.class);
 
     public OrderControllerImpl(OrderService orderService, CartService cartService, AuthService authService, ProductServiceImpl productServiceImpl) {
         this.orderService = orderService;
@@ -49,15 +54,19 @@ public class OrderControllerImpl implements OrderController {
 
     @Override
     @GetMapping("/list")
-    public String showOrders(Model model) {
+    public String showOrders(Principal principal, Model model) {
         List<OrderDto> orders = orderService.findAll();
         model.addAttribute("orders", orders);
+        LOG.log(Level.INFO,"GET/order/list request from "+ principal.getName());
         return "ordersList.html";
     }
 
     @Override
     @GetMapping("/cart")
     public String showCart(@AuthenticationPrincipal User user, Model model) {
+        String logoPath = "/images/logo.jpg";
+        BaseView baseView = new BaseView(logoPath, "Мы продаём цветы 5 лет");
+        model.addAttribute("baseView", baseView);
         String username = user.getUsername();
         UserEntity userEntity = authService.getUser(username);
         Object cart = cartService.getCart(String.valueOf(userEntity.getId()));
@@ -83,6 +92,7 @@ public class OrderControllerImpl implements OrderController {
 
         model.addAttribute("totalPrice",totalPrice);
         model.addAttribute("cartItems",itemsView);
+        LOG.log(Level.INFO,"GET/order/cart request from "+ user.getUsername());
         return "cart.html";
     }
 
@@ -104,6 +114,7 @@ public class OrderControllerImpl implements OrderController {
         if (categoryType == null || categoryType.isEmpty()) {
             return "redirect:/order/cart?";
         }
+        LOG.log(Level.INFO,"POST/order/cart/add request from "+ user.getUsername()+ "for product with id: "+productId);
         return "redirect:/product/catalog?categoryType=" + categoryType;
     }
 
@@ -113,6 +124,7 @@ public class OrderControllerImpl implements OrderController {
         String username = user.getUsername();
         UserEntity userEntity = authService.getUser(username);
         cartService.clearCart(String.valueOf(userEntity.getId()));
+        LOG.log(Level.INFO,"GET/order/clear request from "+ user.getUsername());
 
         return "redirect:/order/cart?";
     }
@@ -122,6 +134,7 @@ public class OrderControllerImpl implements OrderController {
         String username = user.getUsername();
         UserEntity userEntity = authService.getUser(username);
         String userId= String.valueOf(userEntity.getId());
+        LOG.log(Level.INFO,"POST/order/checkout request from "+ user.getUsername());
         try {
             System.out.println("created");
             orderService.createOrder(userId);
@@ -138,6 +151,7 @@ public class OrderControllerImpl implements OrderController {
         UserEntity userEntity = authService.getUser(username);
         String userId= String.valueOf(userEntity.getId());
         cartService.decreaseQuantity(userId, String.valueOf(productId));
+        LOG.log(Level.INFO,"POST/order/cart/decrease request from "+ user.getUsername()+ "for product with id: "+productId);
         return "redirect:/order/cart?";
     }
 }

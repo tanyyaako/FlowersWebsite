@@ -11,8 +11,6 @@ public class CategoryEntity extends BaseEntity {
     private String description;
     private Set<ProductEntity> productEntities;
     private CategoryType categoryType;
-
-
     public CategoryEntity(String description, String name, Set<ProductEntity> productEntities,CategoryType categoryType) {
         this.description = description;
         this.name = name;
@@ -54,8 +52,6 @@ public class CategoryEntity extends BaseEntity {
     public CategoryType getCategoryType() {
         return categoryType;
     }
-
-
     public void setCategoryType(CategoryType categoryType) {
         this.categoryType = categoryType;
     }

@@ -1,6 +1,9 @@
 package org.example.flowerswebsite.Controllers;
 
 import jakarta.validation.Valid;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.controllers.Category.CategoryController;
 import org.example.flowerswebsite.DTO.CategoryDto;
 import org.example.flowerswebsite.DTO.ProductDto;
@@ -19,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -27,6 +31,7 @@ public class CategoryControllerImpl implements CategoryController {
     private final CategoryService categoryService;
     private final ModelMapper modelMapper;
     private final ProductService productService;
+    private static final Logger LOG = LogManager.getLogger(Controller.class);
 
     @Autowired
     public CategoryControllerImpl(ModelMapper modelMapper, CategoryService categoryService, ProductService productService) {
@@ -42,7 +47,8 @@ public class CategoryControllerImpl implements CategoryController {
 
     @Override
     @GetMapping("/listCategory")
-    public String listProducts(Model model){
+    public String listProducts(Principal principal, Model model){
+        LOG.log(Level.INFO,"listCategory request from "+ principal.getName());
         List<CategoryDto> categoryDtos = categoryService.getAll();
         List<CategoryView> categoryViews = categoryDtos.stream()
                 .map(categoryDto -> modelMapper.map(categoryDto,CategoryView.class))
@@ -52,7 +58,8 @@ public class CategoryControllerImpl implements CategoryController {
     }
     @Override
     @GetMapping("/create")
-    public String createForm(Model model){
+    public String createForm(Principal principal,Model model){
+        LOG.log(Level.INFO,"GET/create/category request from "+ principal.getName());
         model.addAttribute("form", new CategoryCreateForm("",""));
         model.addAttribute("categoryTypes", List.of("Flowers", "Gifts", "Celebration"));
         return "CategoryList.html";
@@ -61,7 +68,8 @@ public class CategoryControllerImpl implements CategoryController {
     @Override
     @PostMapping("/create")
     public String create(@Valid @ModelAttribute("form") CategoryCreateForm form,
-                         BindingResult bindingResult,Model model){
+                         BindingResult bindingResult,Principal principal,Model model){
+        LOG.log(Level.INFO,"POST/create/category request from "+ principal.getName());
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setName(form.name());
         categoryDto.setType(CategoryType.valueOf(form.type().toUpperCase()));
@@ -71,7 +79,7 @@ public class CategoryControllerImpl implements CategoryController {
 
     @Override
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable Long id,Model model){
+    public String editForm(@PathVariable Long id,Principal principal,Model model){
         CategoryDto categoryDto = categoryService.findById(id);
         List<ProductDto> products = productService.getAllByCategory(categoryDto.getId());
         CategoryView categoryView = new CategoryView(
@@ -81,6 +89,7 @@ public class CategoryControllerImpl implements CategoryController {
                 categoryDto.getProductIds(),
                 categoryDto.getType().toString()
         );
+        LOG.log(Level.INFO,"GET/edit/category request from "+ principal.getName()+" product with id "+ categoryDto.getId());
         CategoryEditForm categoryEditForm = new CategoryEditForm(categoryView.getId(),categoryView.getName(),categoryView.getDescription(), categoryView.getType());
         model.addAttribute("updateCategory",categoryEditForm);
         model.addAttribute("categoryTypes", List.of("Flowers", "Gifts", "Celebration"));
@@ -90,13 +99,14 @@ public class CategoryControllerImpl implements CategoryController {
     @Override
     @PostMapping("/{id}/edit")
     public String edit(@PathVariable Long id, @Valid @ModelAttribute("updateCategory") CategoryEditForm form,
-                       BindingResult bindingResult, Model model){
+                       BindingResult bindingResult,Principal principal, Model model){
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setId(id);
         System.out.println(categoryDto.getId());
         categoryDto.setName(form.name());
         categoryDto.setType(CategoryType.valueOf(form.type().toUpperCase()));
         categoryService.updateCategory(categoryDto);
+        LOG.log(Level.INFO,"POST/edit/category request from "+ principal.getName()+" product with id "+ categoryDto.getId());
         return "redirect:/category/listCategory";
     }
 }

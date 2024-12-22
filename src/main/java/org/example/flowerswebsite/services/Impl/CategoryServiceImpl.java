@@ -67,5 +67,4 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
         return categoryDtos;
     }
-
 }
